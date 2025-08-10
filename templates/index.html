@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOMAPORT - Génération de QR Code Avancée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+        --somaport-green: #66CC33;
+        --somaport-green-dark: #4CAF50;
+        --somaport-green-light: #8BC34A;
+        --sea-blue: #0077B6;
+        --sea-blue-dark: #005F99;
+        --wind-gray: #ECEFF1;
+        --wind-gray-dark: #B0BEC5;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --background-color: #f8fafc;
+        --surface-color: #ffffff;
+        --border-color: #e2e8f0;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --error-color: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05  );
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem; }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green));
+        min-height: 100vh;
+        color: var(--text-primary);
+        line-height: 1.1;
+        overflow-x: hidden;
+    }
+
+    /* Welcome Screen Styles */
+    .welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .welcome-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .welcome-content {
+        text-align: center;
+        color: white;
+        max-width: 600px;
+        padding: 2rem;
+    }
+
+    .welcome-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .welcome-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 1s ease 0.5s both;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.5rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        animation: fadeInUp 1s ease 0.7s both;
+    }
+
+    .welcome-description {
+        font-size: 1.125rem;
+        margin-bottom: 3rem;
+        opacity: 0.8;
+        line-height: 1.8;
+        animation: fadeInUp 1s ease 0.9s both;
+    }
+
+    .enter-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        animation: fadeInUp 1s ease 1.1s both;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .enter-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .enter-button:active {
+        transform: translateY(0);
+    }
+
+    .enter-arrow {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .enter-button:hover .enter-arrow {
+        transform: translateX(5px);
+    }
+
+    /* Sea Wave Animation */
+    .wave-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .wave-container.active {
+        opacity: 1;
+    }
+
+    .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 200%;
+        height: 100vh;
+        background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(0, 119, 182, 0.1) 30%,
+            rgba(0, 119, 182, 0.3) 60%,
+            rgba(0, 119, 182, 0.6) 80%,
+            var(--sea-blue) 100%);
+        animation: wave-animation 2s ease-in-out;
+    }
+
+    .wave::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.3' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.5' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3C/svg%3E"  ) no-repeat center bottom;
+        background-size: cover;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translateY(100%);
+        animation: wave-rise 2s ease-out forwards;
+    }
+
+    @keyframes wave-animation {
+        0% {
+            transform: translateX(0) translateY(100%);
+        }
+        100% {
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    @keyframes wave-rise {
+        0% {
+            transform: translateY(100%);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    /* General Layout */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .container.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 2rem;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo img {
+        height: 60px;
+        margin-right: 100px;
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        margin-left: 1.5rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: var(--wind-gray);
+    }
+
+    .main-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        background-color: var(--surface-color);
+        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .upload-section {
+        background-color: var(--wind-gray);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        border: 2px dashed var(--wind-gray-dark);
+        transition: border-color 0.3s ease;
+    }
+
+    .upload-section.drag-over {
+        border-color: var(--somaport-green);
+    }
+
+    .upload-icon {
+        font-size: 4rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .upload-section p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    .file-input-label {
+        background-color: var(--somaport-green);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+    }
+
+    .file-input-label:hover {
+        background-color: var(--somaport-green-dark);
+    }
+
+    #pdf_file, #batch_pdf_files {
+        display: none;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        color: var(--text-primary);
+        background-color: var(--background-color);
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group input[type="email"]:focus {
+        outline: none;
+        border-color: var(--somaport-green);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        flex-grow: 1;
+    }
+
+    .btn-primary {
+        background-color: var(--somaport-green);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--somaport-green-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: var(--sea-blue);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--sea-blue-dark);
+        transform: translateY(-2px);
+    }
+
+    .sidebar {
+        background-color: var(--background-color);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar h3 {
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .history-item:last-child {
+        border-bottom: none;
+    }
+
+    .history-filename {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .history-status {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: var(--radius-sm);
+        color: white;
+    }
+
+    .status-completed {
+        background-color: var(--success-color);
+    }
+
+    .status-error {
+        background-color: var(--error-color);
+    }
+
+    .status-pending {
+        background-color: var(--warning-color);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-card {
+        background-color: var(--surface-color);
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .stat-card h4 {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card p {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--somaport-green);
+    }
+
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-top: 2rem;
+    }
+
+    .footer a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Alerts and Notifications */
+    .alert {
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #34d399;
+    }
+
+    .alert-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #f87171;
+    }
+
+    .alert-info {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #7dd3fc;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        color: white;
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+        display: none;
+    }
+
+    .loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    /* AJOUT : Styles pour la modale de confidentialité */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content {
+        transform: scale(1);
+    }
+    .modal-content h2 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+    .modal-content p, .modal-content ul {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    .modal-content ul {
+        padding-left: 1.5rem;
+    }
+    .modal-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border: none;
+        background: none;
+    }
+    /* FIN AJOUT */
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .main-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .nav-links {
+            margin-top: 1rem;
+        }
+
+        .nav-links a {
+            margin: 0 0.8rem;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+        }
+
+        .welcome-description {
+            font-size: 1rem;
+        }
+
+        .enter-button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .main-content {
+            padding: 1.5rem;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+            padding: 0.7rem 1rem;
+        }
+
+        .stat-card h4 {
+            font-size: 1rem;
+        }
+
+        .stat-card p {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+</head> <body>
+<!-- Welcome Screen -->
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="wave-container" id="waveContainer"></div>
+    <div class="welcome-content">
+        <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport" class="welcome-logo">
+        <h1 class="welcome-title">Bienvenue chez SOMAPORT</h1>
+        <p class="welcome-subtitle">Votre solution avancée de gestion de documents</p>
+        <p class="welcome-description">
+            Optimisez vos opérations portuaires avec notre plateforme intuitive.
+            Générez des codes QR pour vos documents essentiels en quelques clics,
+            assurant une traçabilité et une efficacité inégalées.
+        </p>
+        <button class="enter-button" id="enterAppButton">
+            Accéder à l'application <i class="fas fa-arrow-right enter-arrow"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Main Application Container -->
+<div class="container" id="appContainer">
+    <header class="header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport" class="welcome-logo">
+            SOMAPORT QR
+        </div>
+        <nav class="nav-links">
+            <a href="#" id="singleUploadLink"><i class="fas fa-upload"></i> Téléchargement Simple</a>
+            <a href="#" id="batchUploadLink"><i class="fas fa-layer-group"></i> Téléchargement par Lot</a>
+            <a href="#" id="historyLink"><i class="fas fa-history"></i> Historique</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="upload-area" id="singleUploadSection">
+            <h2>Générer un QR Code pour un PDF</h2>
+            <div class="alert alert-info" id="singleUploadAlert" style="display: none;"></div>
+            <div class="upload-section" id="dropArea">
+                <i class="fas fa-file-upload upload-icon"></i>
+                <p>Glissez & déposez votre fichier PDF ici, ou</p>
+                <label for="pdf_file" class="file-input-label">
+                    <i class="fas fa-folder-open"></i> Choisir un fichier
+                </label>
+                <input type="file" id="pdf_file" name="pdf_file" accept=".pdf">
+            </div>
+            <div id="fileNameDisplay" style="margin-top: 1rem; font-weight: 500; color: var(--text-primary );"></div>
+            <div class="button-group">
+                <button class="btn btn-primary" id="uploadButton"><i class="fas fa-qrcode"></i> Générer le QR Code</button>
+            </div>
+        </section>
+
+        <section class="upload-area" id="batchUploadSection" style="display: none;">
+            <h2>Générer des QR Codes par Lot</h2>
+            <div class="alert alert-info" id="batchUploadAlert" style="display: none;"></div>
+            <div class="upload-section" id="batchDropArea">
+                <i class="fas fa-files upload-icon"></i>
+                <p>Glissez & déposez plusieurs fichiers PDF ici, ou</p>
+                <label for="batch_pdf_files" class="file-input-label">
+                    <i class="fas fa-folder-open"></i> Choisir des fichiers
+                </label>
+                <input type="file" id="batch_pdf_files" name="batch_pdf_files" accept=".pdf" multiple>
+            </div>
+            <div id="batchFileNamesDisplay" style="margin-top: 1rem; font-weight: 500; color: var(--text-primary);"></div>
+            <div class="button-group">
+                <button class="btn btn-secondary" id="batchUploadButton"><i class="fas fa-cogs"></i> Générer par Lot</button>
+            </div>
+        </section>
+
+        <section class="history-section" id="historySection" style="display: none;">
+            <h2>Historique des Traitements</h2>
+            <div class="alert alert-info" id="historyAlert" style="display: none;"></div>
+            <div id="historyList">
+                <!-- History items will be loaded here -->
+                <p style="text-align: center; color: var(--text-secondary);">Chargement de l'historique...</p>
+            </div>
+        </section>
+
+        <aside class="sidebar">
+            <h3>Statistiques</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Traités</h4>
+                    <p id="totalProcessed">0</p>
+                </div>
+
+                                <div class="stat-card">
+                    <h4>Aujourd'hui</h4>
+                    <p id="todayProcessed">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Temps Moyen</h4>
+                    <p id="avgTime">0s</p>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#" id="privacyPolicyLink">Politique de Confidentialité</a></p>
+    </footer>
+</div>
+
+<!-- AJOUT : Fenêtre modale pour la politique de confidentialité -->
+<div class="modal-overlay" id="privacyModal">
+    <div class="modal-content">
+        <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
+        <h2>Politique de Confidentialité de SOMAPORT</h2>
+        <p><strong>Dernière mise à jour : 10 août 2025</strong></p>
+        <p>
+            Chez SOMAPORT, nous respectons votre vie privée. Cette politique de confidentialité explique comment nous traitons les informations lorsque vous utilisez notre service de génération de QR code pour PDF.
+        </p>
+
+        <h4>Collecte et Utilisation des Fichiers</h4>
+        <p>
+            Nous ne collectons aucune information personnelle identifiable. Lorsque vous téléchargez un fichier PDF pour générer un QR code, ce fichier est utilisé uniquement pour le processus de génération.
+        </p>
+
+        <h4>Stockage et Sécurité des Fichiers</h4>
+        <p>
+            Votre vie privée est notre priorité. Les fichiers PDF que vous téléchargez sont traités de manière sécurisée et <strong>ne sont pas stockés sur nos serveurs</strong>. Ils sont supprimés immédiatement après la génération du QR code. Nous ne conservons aucune copie de vos documents.
+        </p>
+
+        <h4>Partage d'Informations</h4>
+        <p>
+            Nous ne partageons, ne vendons ni ne louons vos informations ou le contenu de vos fichiers à des tiers.
+        </p>
+    </div>
+</div>
+<!-- FIN AJOUT -->
+
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p id="loadingMessage">Traitement en cours...</p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const enterAppButton = document.getElementById('enterAppButton');
+        const appContainer = document.getElementById('appContainer');
+        const waveContainer = document.getElementById('waveContainer');
+
+        const singleUploadLink = document.getElementById('singleUploadLink');
+        const batchUploadLink = document.getElementById('batchUploadLink');
+        const historyLink = document.getElementById('historyLink');
+
+        const singleUploadSection = document.getElementById('singleUploadSection');
+        const batchUploadSection = document.getElementById('batchUploadSection');
+        const historySection = document.getElementById('historySection');
+
+        const dropArea = document.getElementById('dropArea');
+        const pdfFileInput = document.getElementById('pdf_file');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const uploadButton = document.getElementById('uploadButton');
+        const singleUploadAlert = document.getElementById('singleUploadAlert');
+
+        const batchDropArea = document.getElementById('batchDropArea');
+        const batchPdfFileInput = document.getElementById('batch_pdf_files');
+        const batchFileNamesDisplay = document.getElementById('batchFileNamesDisplay');
+        const batchUploadButton = document.getElementById('batchUploadButton');
+        const batchUploadAlert = document.getElementById('batchUploadAlert');
+
+        const historyList = document.getElementById('historyList');
+        const historyAlert = document.getElementById('historyAlert');
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        // AJOUT : Logique pour la modale de confidentialité
+        const privacyModal = document.getElementById('privacyModal');
+        const privacyPolicyLink = document.getElementById('privacyPolicyLink');
+        const closePrivacyModal = document.getElementById('closePrivacyModal');
+
+        privacyPolicyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            privacyModal.classList.add('active');
+        });
+
+        closePrivacyModal.addEventListener('click', () => {
+            privacyModal.classList.remove('active');
+        });
+
+        privacyModal.addEventListener('click', (e) => {
+            if (e.target === privacyModal) {
+                privacyModal.classList.remove('active');
+            }
+        });
+        // FIN AJOUT
+
+        // --- Welcome Screen Logic ---
+        enterAppButton.addEventListener('click', () => {
+            waveContainer.classList.add('active');
+            const waveElement = document.createElement('div');
+            waveElement.classList.add('wave');
+            waveContainer.appendChild(waveElement);
+
+            setTimeout(() => {
+                welcomeScreen.classList.add('hidden');
+                appContainer.classList.add('active');
+                fetchStats();
+                fetchHistory();
+            }, 1500); // Duration of wave animation
+        });
+
+        // --- Navigation Logic ---
+        function showSection(sectionToShow) {
+            [singleUploadSection, batchUploadSection, historySection].forEach(section => {
+                section.style.display = 'none';
+            });
+            sectionToShow.style.display = 'block';
+        }
+
+        singleUploadLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(singleUploadSection);
+        });
+
+        batchUploadLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(batchUploadSection);
+        });
+
+        historyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(historySection);
+            fetchHistory();
+        });
+
+        // --- Drag and Drop Functionality ---
+        function setupDropArea(area, input, display) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                area.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                area.addEventListener(eventName, () => area.classList.add('drag-over'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                area.addEventListener(eventName, () => area.classList.remove('drag-over'), false);
+            });
+
+            area.addEventListener('drop', (e) => {
+                input.files = e.dataTransfer.files;
+                updateFileNameDisplay(input, display);
+            }, false);
+
+            input.addEventListener('change', () => updateFileNameDisplay(input, display));
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function updateFileNameDisplay(input, display) {
+            if (input.files.length > 0) {
+                if (input.multiple) {
+                    display.textContent = `${input.files.length} fichiers sélectionnés`;
+                } else {
+                    display.textContent = input.files[0].name;
+                }
+            } else {
+                display.textContent = '';
+            }
+        }
+
+        setupDropArea(dropArea, pdfFileInput, fileNameDisplay);
+        setupDropArea(batchDropArea, batchPdfFileInput, batchFileNamesDisplay);
+
+        // --- Single File Upload ---
+        uploadButton.addEventListener('click', async () => {
+            const file = pdfFileInput.files[0];
+            if (!file) {
+                showAlert(singleUploadAlert, 'Veuillez sélectionner un fichier PDF.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('pdf_file', file);
+
+            showLoading('Génération du QR Code...');
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                    showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
+                    pdfFileInput.value = ''; // Clear input
+                    fileNameDisplay.textContent = '';
+                    fetchHistory();
+                    fetchStats();
+                } else {
+                    const errorData = await response.json();
+                    showAlert(singleUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue.'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'upload:', error);
+                showAlert(singleUploadAlert, 'Erreur de connexion au serveur.', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // --- Batch File Upload ---
+        batchUploadButton.addEventListener('click', async () => {
+            const files = batchPdfFileInput.files;
+            if (files.length === 0) {
+                showAlert(batchUploadAlert, 'Veuillez sélectionner au moins un fichier PDF.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('pdf_files', files[i]);
+            }
+
+            showLoading(`Traitement de ${files.length} fichiers...`);
+
+            try {
+                const response = await fetch('/batch_upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                    showAlert(batchUploadAlert, 'Fichiers traités et téléchargés en lot avec succès !', 'success');
+                    batchPdfFileInput.value = ''; // Clear input
+                    batchFileNamesDisplay.textContent = '';
+                    fetchHistory();
+                    fetchStats();
+                } else {
+                    const errorData = await response.json();
+                    showAlert(batchUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue lors du traitement par lot.'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'upload par lot:', error);
+                showAlert(batchUploadAlert, 'Erreur de connexion au serveur pour le traitement par lot.', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // --- History and Stats Fetching ---
+        async function fetchHistory() {
+            try {
+                const response = await fetch('/history');
+                const data = await response.json();
+                if (response.ok) {
+                    displayHistory(data.files);
+                } else {
+                    showAlert(historyAlert, `Erreur: ${data.error || 'Impossible de charger l\'historique.'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'historique:', error);
+                showAlert(historyAlert, 'Erreur de connexion pour l\'historique.', 'error');
+            }
+        }
+
+        function displayHistory(files) {
+            historyList.innerHTML = '';
+            if (files.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucun historique disponible.</p>';
+                return;
+            }
+            files.forEach(file => {
+                const item = document.createElement('div');
+                item.classList.add('history-item');
+                item.innerHTML = `
+                        <span class="history-filename">${file.filename}</span>
+                        <span class="history-status status-${file.status}">${file.status}</span>
+                    `;
+                historyList.appendChild(item);
+            });
+        }
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('totalProcessed').textContent = data.total_completed;
+                    document.getElementById('todayProcessed').textContent = data.today_completed;
+                    document.getElementById('avgTime').textContent = `${data.avg_processing_time}s`;
+                } else {
+                    console.error('Erreur lors du chargement des stats:', data.error);
+                }
+            } catch (error) {
+                console.error('Erreur de connexion pour les stats:', error);
+            }
+        }
+
+        // --- Utility Functions ---
+        function showAlert(element, message, type) {
+            element.textContent = message;
+            element.className = `alert alert-${type}`;
+            element.style.display = 'flex';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(message) {
+            loadingMessage.textContent = message;
+            loadingOverlay.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+    });
+</script>
+</body> </html>
