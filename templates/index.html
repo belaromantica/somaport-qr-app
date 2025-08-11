@@ -23,7 +23,7 @@
         --success-color: #10b981;
         --warning-color: #f59e0b;
         --error-color: #ef4444;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05  );
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05 );
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
@@ -182,7 +182,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.3' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.5' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3C/svg%3E"  ) no-repeat center bottom;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.3' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.5' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3C/svg%3E" ) no-repeat center bottom;
         background-size: cover;
         position: absolute;
         bottom: 0;
@@ -535,65 +535,6 @@
         animation: spin 1s linear infinite;
     }
 
-    /* AJOUT : Styles pour la modale de confidentialité */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    .modal-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-    .modal-content {
-        background: white;
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-        max-width: 600px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-    }
-    .modal-overlay.active .modal-content {
-        transform: scale(1);
-    }
-    .modal-content h2 {
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-    }
-    .modal-content p, .modal-content ul {
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin-bottom: 1rem;
-    }
-    .modal-content ul {
-        padding-left: 1.5rem;
-    }
-    .modal-close-btn {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        font-size: 1.5rem;
-        color: var(--text-secondary);
-        cursor: pointer;
-        border: none;
-        background: none;
-    }
-    /* FIN AJOUT */
-
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -762,52 +703,24 @@
                     <h4>Total Traités</h4>
                     <p id="totalProcessed">0</p>
                 </div>
-
-                                <div class="stat-card">
+                <div class="stat-card">
                     <h4>Aujourd'hui</h4>
                     <p id="todayProcessed">0</p>
                 </div>
                 <div class="stat-card">
-                    <h4>Temps Moyen</h4>
-                    <p id="avgTime">0s</p>
+                     <h4>Temps de traitement</h4>
+                    <p id="lastTime">0s</p> <!-- Note : J'ai aussi changé l'id pour plus de clarté -->
                 </div>
+
+
             </div>
         </aside>
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#" id="privacyPolicyLink">Politique de Confidentialité</a></p>
+        <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#">Politique de Confidentialité</a></p>
     </footer>
 </div>
-
-<!-- AJOUT : Fenêtre modale pour la politique de confidentialité -->
-<div class="modal-overlay" id="privacyModal">
-    <div class="modal-content">
-        <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
-        <h2>Politique de Confidentialité de SOMAPORT</h2>
-        <p><strong>Dernière mise à jour : 10 août 2025</strong></p>
-        <p>
-            Chez SOMAPORT, nous respectons votre vie privée. Cette politique de confidentialité explique comment nous traitons les informations lorsque vous utilisez notre service de génération de QR code pour PDF.
-        </p>
-
-        <h4>Collecte et Utilisation des Fichiers</h4>
-        <p>
-            Nous ne collectons aucune information personnelle identifiable. Lorsque vous téléchargez un fichier PDF pour générer un QR code, ce fichier est utilisé uniquement pour le processus de génération.
-        </p>
-
-        <h4>Stockage et Sécurité des Fichiers</h4>
-        <p>
-            Votre vie privée est notre priorité. Les fichiers PDF que vous téléchargez sont traités de manière sécurisée et <strong>ne sont pas stockés sur nos serveurs</strong>. Ils sont supprimés immédiatement après la génération du QR code. Nous ne conservons aucune copie de vos documents.
-        </p>
-
-        <h4>Partage d'Informations</h4>
-        <p>
-            Nous ne partageons, ne vendons ni ne louons vos informations ou le contenu de vos fichiers à des tiers.
-        </p>
-    </div>
-</div>
-<!-- FIN AJOUT -->
-
 
 <!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay">
@@ -827,7 +740,7 @@
         const historyLink = document.getElementById('historyLink');
 
         const singleUploadSection = document.getElementById('singleUploadSection');
-        const batchUploadSection = document.getElementById('batchUploadSection');
+        const batchUploadSection = document.getElementById('ba tchUploadSection');
         const historySection = document.getElementById('historySection');
 
         const dropArea = document.getElementById('dropArea');
@@ -847,27 +760,6 @@
 
         const loadingOverlay = document.getElementById('loadingOverlay');
         const loadingMessage = document.getElementById('loadingMessage');
-
-        // AJOUT : Logique pour la modale de confidentialité
-        const privacyModal = document.getElementById('privacyModal');
-        const privacyPolicyLink = document.getElementById('privacyPolicyLink');
-        const closePrivacyModal = document.getElementById('closePrivacyModal');
-
-        privacyPolicyLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            privacyModal.classList.add('active');
-        });
-
-        closePrivacyModal.addEventListener('click', () => {
-            privacyModal.classList.remove('active');
-        });
-
-        privacyModal.addEventListener('click', (e) => {
-            if (e.target === privacyModal) {
-                privacyModal.classList.remove('active');
-            }
-        });
-        // FIN AJOUT
 
         // --- Welcome Screen Logic ---
         enterAppButton.addEventListener('click', () => {
@@ -936,16 +828,25 @@
         }
 
         function updateFileNameDisplay(input, display) {
-            if (input.files.length > 0) {
-                if (input.multiple) {
-                    display.textContent = `${input.files.length} fichiers sélectionnés`;
-                } else {
-                    display.textContent = input.files[0].name;
-                }
-            } else {
-                display.textContent = '';
-            }
+    if (input.files.length > 0) {
+        const file = input.files[0];
+        const fileSize = file.size; // Taille en octets
+        const fileSizeKB = (fileSize / 1024).toFixed(2); // Taille en Ko
+        const MAX_SIZE_KB = 3; // Limite de 3 Ko
+
+        // Affiche le nom et la taille
+        display.textContent = `${file.name} (${fileSizeKB} KB)`;
+
+        // Vérifie la taille et affiche une alerte si elle est dépassée
+        if (fileSizeKB > MAX_SIZE_KB) {
+            showAlert(singleUploadAlert, `Erreur : Le fichier dépasse la limite de ${MAX_SIZE_KB} KB.`, 'error');
         }
+
+    } else {
+        display.textContent = '';
+    }
+}
+
 
         setupDropArea(dropArea, pdfFileInput, fileNameDisplay);
         setupDropArea(batchDropArea, batchPdfFileInput, batchFileNamesDisplay);
@@ -978,8 +879,21 @@
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                    URL.revokeObjectURL(downloadUrl);
-                    showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
+                    // ...
+URL.revokeObjectURL(downloadUrl);
+
+// --- AJOUT ---
+// Récupérer le temps de traitement depuis l'en-tête de la réponse
+const processingTime = response.headers.get('X-Processing-Time');
+if (processingTime) {
+    // Mettre à jour le champ des statistiques
+    document.getElementById('lastTime').textContent = `${processingTime}s`;
+}
+// --- FIN DE L'AJOUT ---
+
+showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
+// ...
+
                     pdfFileInput.value = ''; // Clear input
                     fileNameDisplay.textContent = '';
                     fetchHistory();
@@ -1017,22 +931,35 @@
                     body: formData,
                 });
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const downloadUrl = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = downloadUrl;
-                    a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    URL.revokeObjectURL(downloadUrl);
-                    showAlert(batchUploadAlert, 'Fichiers traités et téléchargés en lot avec succès !', 'success');
-                    batchPdfFileInput.value = ''; // Clear input
-                    batchFileNamesDisplay.textContent = '';
-                    fetchHistory();
-                    fetchStats();
-                } else {
+                // BLOC DE CODE CORRIGÉ
+if (response.ok) {
+    const blob = await response.blob();
+    const downloadUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = response.headers.get('Content-Disposition').split('filename=')[1].replace(/"/g, '');
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(downloadUrl);
+
+    // --- DÉBUT DE L'AJOUT ---
+    // On récupère le temps de traitement depuis l'en-tête personnalisé
+    const processingTime = response.headers.get('X-Processing-Time');
+    if (processingTime) {
+        // On met à jour le champ de statistique avec l'id 'lastTime'
+        document.getElementById('lastTime').textContent = `${processingTime}s`;
+    }
+    // --- FIN DE L'AJOUT ---
+
+    showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
+    pdfFileInput.value = ''; // Clear input
+    fileNameDisplay.textContent = '';
+    fetchHistory();
+    fetchStats(); // On appelle fetchStats() pour mettre à jour "Total" et "Aujourd'hui"
+} else {
+// ...
+
                     const errorData = await response.json();
                     showAlert(batchUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue lors du traitement par lot.'}`, 'error');
                 }
@@ -1069,10 +996,7 @@
             files.forEach(file => {
                 const item = document.createElement('div');
                 item.classList.add('history-item');
-                item.innerHTML = `
-                        <span class="history-filename">${file.filename}</span>
-                        <span class="history-status status-${file.status}">${file.status}</span>
-                    `;
+                item.innerHTML = `\n                        <span class="history-filename">${file.filename}</span>\n                        <span class="history-status status-${file.status}">${file.status}</span>\n                    `;
                 historyList.appendChild(item);
             });
         }
@@ -1085,6 +1009,7 @@
                     document.getElementById('totalProcessed').textContent = data.total_completed;
                     document.getElementById('todayProcessed').textContent = data.today_completed;
                     document.getElementById('avgTime').textContent = `${data.avg_processing_time}s`;
+                    document.getElementById('totalErrors').textContent = data.total_errors;
                 } else {
                     console.error('Erreur lors du chargement des stats:', data.error);
                 }
@@ -1111,6 +1036,10 @@
         function hideLoading() {
             loadingOverlay.style.display = 'none';
         }
+
+        // Initial load
+        // fetchStats(); // Moved to after welcome screen hides
+        // fetchHistory(); // Moved to after welcome screen hides
     });
 </script>
 </body> </html>
