@@ -238,7 +238,7 @@
 
     .logo img {
         height: 60px;
-        margin-right: 1rem; /* Ajusté pour un meilleur espacement */
+        margin-right: 1rem;
         border-radius: 50%;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
@@ -437,7 +437,7 @@
         border-radius: var(--radius-md);
         margin-bottom: 1.5rem;
         font-weight: 500;
-        display: none; /* Caché par défaut */
+        display: none;
         align-items: center;
         gap: 0.75rem;
     }
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Logique de Navigation ---
     function showSection(sectionToShow) {
-        allSections.forEach(section => {
+                allSections.forEach(section => {
             section.style.display = 'none';
         });
         sectionToShow.style.display = 'block';
@@ -709,11 +709,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Logique de Téléchargement Simple ---
     pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay, singleUploadAlert, uploadButton));
     uploadButton.addEventListener('click', handleSingleUpload);
+
     // --- Logique de Téléchargement par Lot ---
-    const batchPdfFileInput = document.getElementById('batch_pdf_files');
-    const batchFileNamesDisplay = document.getElementById('batchFileNamesDisplay');
-    const batchUploadButton = document.getElementById('batchUploadButton');
-    const batchUploadAlert = document.getElementById('batchUploadAlert');
     batchPdfFileInput.addEventListener('change', () => {
         if (batchPdfFileInput.files.length > 0) {
             batchFileNamesDisplay.textContent = `${batchPdfFileInput.files.length} fichiers sélectionnés`;
@@ -722,7 +719,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     batchUploadButton.addEventListener('click', handleBatchUpload);
-
 
     // --- Fonctions ---
     function updateFileNameDisplay(input, display, alertElement, buttonElement) {
@@ -878,8 +874,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showLoading(isLoading, message = 'Traitement en cours...') {
-        const loadingMessage = loadingOverlay.querySelector('p');
-        if (loadingMessage) loadingMessage.textContent = message;
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        // Le message n'est plus dans le loading overlay, donc on l'ignore
         loadingOverlay.style.display = isLoading ? 'flex' : 'none';
     }
 
