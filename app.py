@@ -353,11 +353,30 @@ def upload():
         logger.info(f"Processing completed successfully for: {filename} in {processing_time:.2f}s")
 
         # Return processed file
-        return send_from_directory(
-            PROCESSED_FOLDER,
-            f"{session_id}_{output_filename}",
+        #return send_from_directory(
+         #   PROCESSED_FOLDER,
+          #  f"{session_id}_{output_filename}",
+           # as_attachment=True,
+            #download_name=f'QR_{filename}'
+        # Lire le fichier final en mémoire
+        memory_file = BytesIO()
+        with open(output_path, 'rb') as f:
+            memory_file.write(f.read())
+        memory_file.seek(0)
+
+        # Nettoyer le fichier traité sur le disque
+        os.remove(output_path)
+
+        logger.info(f"Processing completed successfully for: {filename} in {processing_time:.2f}s")
+
+        # Renvoyer le fichier depuis la mémoire
+        return send_file(
+            memory_file,
             as_attachment=True,
-            download_name=f'QR_{filename}'
+            download_name=f'QR_{filename}',
+            mimetype='application/pdf'
+        )
+
         )
 
     except Exception as e:
