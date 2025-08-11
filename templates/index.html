@@ -8,125 +8,706 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --somaport-green: #66CC33; --somaport-green-dark: #4CAF50; --sea-blue: #0077B6;
-            --wind-gray: #ECEFF1; --text-primary: #1e293b; --text-secondary: #64748b;
-            --background-color: #f8fafc; --surface-color: #ffffff; --border-color: #e2e8f0;
-            --success-color: #10b981; --error-color: #ef4444; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem;
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1 ), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green)); min-height: 100vh; color: var(--text-primary); }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 2rem; }
-        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); }
-        .upload-section { text-align: center; }
-        .upload-box { background-color: #f7f9fc; padding: 2rem; border-radius: var(--radius-lg); border: 2px dashed #dce4f0; }
-        .upload-box i { font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; }
-        .file-input-label { background-color: var(--somaport-green); color: white; padding: 0.8rem 1.5rem; border-radius: var(--radius-md); cursor: pointer; display: inline-block; transition: background-color 0.3s; }
-        .file-input-label:hover { background-color: var(--somaport-green-dark); }
-        #pdf_file, #batch_pdf_files { display: none; }
-        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 1.5rem; }
-        .btn-primary { background-color: var(--somaport-green); color: white; }
-        .sidebar { padding-top: 1rem; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
-        .stat-card { background-color: #f7f9fc; padding: 1rem; border-radius: var(--radius-md); text-align: center; }
-        .stat-card h4 { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-        .stat-card p { font-size: 1.8rem; font-weight: 700; color: var(--somaport-green); }
-        .footer { text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
-        .footer a { color: white; text-decoration: none; font-weight: 500; }
-        .footer a:hover { text-decoration: underline; }
-        .alert { padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-weight: 500; }
-        .alert-error { background-color: #fee2e2; color: #991b1b; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: white; padding: 2rem; border-radius: var(--radius-lg); max-width: 600px; width: 90%; position: relative; }
-        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; border: none; background: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        --somaport-green: #66CC33;
+        --somaport-green-dark: #4CAF50;
+        --somaport-green-light: #8BC34A;
+        --sea-blue: #0077B6;
+        --sea-blue-dark: #005F99;
+        --wind-gray: #ECEFF1;
+        --wind-gray-dark: #B0BEC5;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --background-color: #f8fafc;
+        --surface-color: #ffffff;
+        --border-color: #e2e8f0;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --error-color: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05  );
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem; }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green));
+        min-height: 100vh;
+        color: var(--text-primary);
+        line-height: 1.1;
+        overflow-x: hidden;
+    }
+
+    /* Welcome Screen Styles */
+    .welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .welcome-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .welcome-content {
+        text-align: center;
+        color: white;
+        max-width: 600px;
+        padding: 2rem;
+    }
+
+    .welcome-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .welcome-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 1s ease 0.5s both;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.5rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        animation: fadeInUp 1s ease 0.7s both;
+    }
+
+    .welcome-description {
+        font-size: 1.125rem;
+        margin-bottom: 3rem;
+        opacity: 0.8;
+        line-height: 1.8;
+        animation: fadeInUp 1s ease 0.9s both;
+    }
+
+    .enter-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        animation: fadeInUp 1s ease 1.1s both;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .enter-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .enter-button:active {
+        transform: translateY(0);
+    }
+
+    .enter-arrow {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .enter-button:hover .enter-arrow {
+        transform: translateX(5px);
+    }
+
+    /* Sea Wave Animation */
+    .wave-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .wave-container.active {
+        opacity: 1;
+    }
+
+    .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 200%;
+        height: 100vh;
+        background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(0, 119, 182, 0.1) 30%,
+            rgba(0, 119, 182, 0.3) 60%,
+            rgba(0, 119, 182, 0.6) 80%,
+            var(--sea-blue) 100%);
+        animation: wave-animation 2s ease-in-out;
+    }
+
+    .wave::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.3' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.5' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3C/svg%3E"  ) no-repeat center bottom;
+        background-size: cover;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translateY(100%);
+        animation: wave-rise 2s ease-out forwards;
+    }
+
+    @keyframes wave-animation {
+        0% { transform: translateX(0) translateY(100%); }
+        100% { transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes wave-rise {
+        0% { transform: translateY(100%); }
+        100% { transform: translateY(0); }
+    }
+
+    /* General Layout */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .container.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 2rem;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo img {
+        height: 60px;
+        margin-right: 1rem; /* Ajusté pour un meilleur espacement */
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        margin-left: 1.5rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: var(--wind-gray);
+    }
+
+    .main-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    /* MODIFICATION : Nouvelle classe pour le conteneur principal */
+    .content-wrapper {
+        background-color: var(--surface-color);
+        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .upload-section {
+        background-color: var(--wind-gray);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        border: 2px dashed var(--wind-gray-dark);
+        transition: border-color 0.3s ease;
+    }
+
+    .upload-section.drag-over {
+        border-color: var(--somaport-green);
+    }
+
+    .upload-icon {
+        font-size: 4rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .upload-section p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    .file-input-label {
+        background-color: var(--somaport-green);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+    }
+
+    .file-input-label:hover {
+        background-color: var(--somaport-green-dark);
+    }
+
+    #pdf_file, #batch_pdf_files {
+        display: none;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        flex-grow: 1;
+    }
+
+    .btn-primary {
+        background-color: var(--somaport-green);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--somaport-green-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: var(--sea-blue);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--sea-blue-dark);
+        transform: translateY(-2px);
+    }
+
+    .sidebar {
+        background-color: var(--surface-color);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .sidebar h3 {
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .history-item:last-child {
+        border-bottom: none;
+    }
+
+    .history-filename {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .history-status {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: var(--radius-sm);
+        color: white;
+    }
+
+    .status-completed { background-color: var(--success-color); }
+    .status-error { background-color: var(--error-color); }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* MODIFICATION : grille 2x2 */
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background-color: #f7f9fc;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        text-align: center;
+    }
+
+    .stat-card h4 {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card p {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--somaport-green);
+    }
+
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-top: 2rem;
+    }
+
+    .footer a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        display: none; /* Caché par défaut */
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success { background-color: #d1fae5; color: #065f46; }
+    .alert-error { background-color: #fee2e2; color: #991b1b; }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+    }
+
+    .loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    /* --- MODAL STYLES --- */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+    }
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        max-width: 600px;
+        width: 90%;
+        position: relative;
+        line-height: 1.6;
+    }
+    .modal-content h2 { margin-bottom: 1rem; }
+    .modal-content p { margin-bottom: 1rem; }
+    .modal-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        border: none;
+        background: none;
+    }
+
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 992px) {
+        .main-content { grid-template-columns: 1fr; }
+    }
     </style>
 </head>
 <body>
-    <div class="container" id="appContainer">
-        <div class="main-content">
-            <!-- Zone de contenu principal -->
-            <div>
-                <section id="singleUploadSection">
-                    <div class="upload-section">
-                        <h2>Générer un QR Code pour un PDF</h2>
-                        <div class="alert" id="singleUploadAlert" style="display: none;"></div>
-                        <div class="upload-box" id="dropArea">
-                            <i class="fas fa-file-upload"></i>
-                            <p>Glissez & déposez votre fichier PDF ici, ou</p>
-                            <label for="pdf_file" class="file-input-label"><i class="fas fa-folder-open"></i> Choisir un fichier</label>
-                            <input type="file" id="pdf_file" accept=".pdf">
-                        </div>
-                        <div id="fileNameDisplay" style="margin-top: 1rem; font-weight: 500;"></div>
-                        <button class="btn btn-primary" id="uploadButton" disabled><i class="fas fa-qrcode"></i> Générer le QR Code</button>
-                    </div>
-                </section>
-            </div>
+<!-- Welcome Screen -->
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="wave-container" id="waveContainer"></div>
+    <div class="welcome-content">
+        <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport" class="welcome-logo">
+        <h1 class="welcome-title">Bienvenue chez SOMAPORT</h1>
+        <p class="welcome-subtitle">Votre solution avancée de gestion de documents</p>
+        <p class="welcome-description">
+            Optimisez vos opérations portuaires avec notre plateforme intuitive.
+            Générez des codes QR pour vos documents essentiels en quelques clics,
+            assurant une traçabilité et une efficacité inégalées.
+        </p>
+        <button class="enter-button" id="enterAppButton">
+            Accéder à l'application <i class="fas fa-arrow-right enter-arrow"></i>
+        </button>
+    </div>
+</div>
 
-            <!-- Barre latérale avec les statistiques -->
-            <aside class="sidebar">
-                <h3>Statistiques</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>Total Traités</h4>
-                        <p id="totalProcessed">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Aujourd'hui</h4>
-                        <p id="todayProcessed">0</p>
-                    </div>
+<!-- Main Application Container -->
+<div class="container" id="appContainer">
+    <header class="header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport">
+            <span>SOMAPORT QR</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" id="singleUploadLink"><i class="fas fa-upload"></i> Téléchargement Simple</a>
+            <a href="#" id="batchUploadLink"><i class="fas fa-layer-group"></i> Téléchargement par Lot</a>
+            <a href="#" id="historyLink"><i class="fas fa-history"></i> Historique</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <!-- Conteneur principal pour les sections qui changent -->
+        <div class="content-wrapper">
+            <section id="singleUploadSection">
+                <h2>Générer un QR Code pour un PDF</h2>
+                <div class="alert" id="singleUploadAlert"></div>
+                <div class="upload-section" id="dropArea">
+                    <i class="fas fa-file-upload upload-icon"></i>
+                    <p>Glissez & déposez votre fichier PDF ici, ou</p>
+                    <label for="pdf_file" class="file-input-label"><i class="fas fa-folder-open"></i> Choisir un fichier</label>
+                    <input type="file" id="pdf_file" accept=".pdf">
                 </div>
-                 <div class="stat-card" style="margin-top: 1rem;">
+                <div id="fileNameDisplay" style="margin-top: 1rem; font-weight: 500;"></div>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="uploadButton" disabled><i class="fas fa-qrcode"></i> Générer le QR Code</button>
+                </div>
+            </section>
+
+            <section id="batchUploadSection" style="display: none;">
+                <h2>Générer des QR Codes par Lot</h2>
+                <div class="alert" id="batchUploadAlert"></div>
+                <div class="upload-section" id="batchDropArea">
+                    <i class="fas fa-files upload-icon"></i>
+                    <p>Glissez & déposez plusieurs fichiers PDF ici, ou</p>
+                    <label for="batch_pdf_files" class="file-input-label"><i class="fas fa-folder-open"></i> Choisir des fichiers</label>
+                    <input type="file" id="batch_pdf_files" accept=".pdf" multiple>
+                </div>
+                <div id="batchFileNamesDisplay" style="margin-top: 1rem; font-weight: 500;"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="batchUploadButton"><i class="fas fa-cogs"></i> Générer par Lot</button>
+                </div>
+            </section>
+
+            <section id="historySection" style="display: none;">
+                <h2>Historique des Traitements</h2>
+                <div id="historyList"></div>
+            </section>
+        </div>
+
+        <!-- Barre latérale -->
+        <aside class="sidebar">
+            <h3>Statistiques</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Traités</h4>
+                    <p id="totalProcessed">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Aujourd'hui</h4>
+                    <p id="todayProcessed">0</p>
+                </div>
+                <div class="stat-card">
                     <h4>Dernier Temps</h4>
                     <p id="lastTime">0s</p>
                 </div>
-            </aside>
-        </div>
-        <footer class="footer">
-            <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#" id="privacyPolicyLink">Politique de Confidentialité</a></p>
-        </footer>
+            </div>
+        </aside>
     </div>
 
-    <!-- Fenêtre Modale pour la Politique de Confidentialité -->
-    <div class="modal-overlay" id="privacyModal">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
-            <h2>Politique de Confidentialité de SOMAPORT</h2>
-            <p><strong>Dernière mise à jour : 11 août 2025</strong></p>
-            <p>Nous ne collectons aucune information personnelle. Lorsque vous téléchargez un fichier PDF, il est utilisé uniquement pour générer le QR code et est supprimé de nos serveurs immédiatement après. Nous ne stockons ni ne partageons vos fichiers.</p>
-        </div>
-    </div>
+    <footer class="footer">
+        <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#" id="privacyPolicyLink">Politique de Confidentialité</a></p>
+    </footer>
+</div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
+<!-- Fenêtre Modale pour la Politique de Confidentialité -->
+<div class="modal-overlay" id="privacyModal">
+    <div class="modal-content">
+        <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
+        <h2>Politique de Confidentialité de SOMAPORT</h2>
+        <p><strong>Dernière mise à jour : 10 août 2025</strong></p>
+        <p>Chez SOMAPORT, nous respectons votre vie privée. Cette politique de confidentialité explique comment nous traitons les informations lorsque vous utilisez notre service de génération de QR code pour PDF.</p>
+        <p><strong>Collecte et Utilisation des Fichiers</strong>
+
+        Nous ne collectons aucune information personnelle identifiable. Lorsque vous téléchargez un fichier PDF pour générer un QR code, ce fichier est utilisé uniquement pour le processus de génération.</p>
+        <p><strong>Stockage et Sécurité des Fichiers</strong>
+
+        Votre vie privée est notre priorité. Les fichiers PDF que vous téléchargez sont traités de manière sécurisée et ne sont pas stockés sur nos serveurs. Ils sont supprimés immédiatement après la génération du QR code. Nous ne conservons aucune copie de vos documents.</p>
+        <p><strong>Partage d'Informations</strong>
+
+        Nous ne partageons, ne vendons ni ne louons vos informations ou le contenu de vos fichiers à des tiers.</p>
     </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Éléments du DOM ---
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const enterAppButton = document.getElementById('enterAppButton');
     const appContainer = document.getElementById('appContainer');
+    const waveContainer = document.getElementById('waveContainer');
+
+    const singleUploadLink = document.getElementById('singleUploadLink');
+    const batchUploadLink = document.getElementById('batchUploadLink');
+    const historyLink = document.getElementById('historyLink');
+
+    const allSections = [
+        document.getElementById('singleUploadSection'),
+        document.getElementById('batchUploadSection'),
+        document.getElementById('historySection')
+    ];
+
     const pdfFileInput = document.getElementById('pdf_file');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
     const uploadButton = document.getElementById('uploadButton');
     const singleUploadAlert = document.getElementById('singleUploadAlert');
+
+    const historyList = document.getElementById('historyList');
     const loadingOverlay = document.getElementById('loadingOverlay');
+
     const privacyPolicyLink = document.getElementById('privacyPolicyLink');
     const privacyModal = document.getElementById('privacyModal');
     const closePrivacyModal = document.getElementById('closePrivacyModal');
 
-    // --- Initialisation ---
-    fetchStats();
+    // --- Logique d'Initialisation ---
+    enterAppButton.addEventListener('click', () => {
+        waveContainer.classList.add('active');
+        setTimeout(() => {
+            welcomeScreen.classList.add('hidden');
+            appContainer.classList.add('active');
+            fetchStats();
+            fetchHistory();
+        }, 1500);
+    });
 
-    // --- Logique de Téléchargement ---
-    pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay));
-    uploadButton.addEventListener('click', handleUpload);
+    // --- Logique de
+    // --- Logique de Navigation ---
+    function showSection(sectionToShow) {
+        allSections.forEach(section => {
+            section.style.display = 'none';
+        });
+        sectionToShow.style.display = 'block';
+    }
 
-    // --- Logique de la modale de confidentialité ---
+    singleUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[0]); });
+    batchUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[1]); });
+    historyLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[2]); fetchHistory(); });
+
+    // --- Logique de la Modale de Confidentialité ---
     privacyPolicyLink.addEventListener('click', (e) => { e.preventDefault(); privacyModal.style.display = 'flex'; });
     closePrivacyModal.addEventListener('click', () => { privacyModal.style.display = 'none'; });
     privacyModal.addEventListener('click', (e) => { if (e.target === privacyModal) { privacyModal.style.display = 'none'; } });
+
+    // --- Logique de Téléchargement Simple ---
+    pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay));
+    uploadButton.addEventListener('click', handleUpload);
 
     // --- Fonctions ---
     function updateFileNameDisplay(input, display) {
@@ -135,12 +716,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const fileSizeKB = (file.size / 1024).toFixed(2);
             display.textContent = `${file.name} (${fileSizeKB} KB)`;
 
-            if (file.size > 3 * 1024) {
+            if (file.size > 3 * 1024) { // Limite de 3 Ko
                 showAlert(singleUploadAlert, `Erreur : Le fichier dépasse la limite de 3 KB.`, 'error');
                 uploadButton.disabled = true;
             } else {
+                showAlert(singleUploadAlert, '', 'success', true); // Cache l'alerte si le fichier est valide
                 uploadButton.disabled = false;
-                singleUploadAlert.style.display = 'none'; // Cacher l'alerte si le fichier est valide
             }
         } else {
             display.textContent = '';
@@ -177,7 +758,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 pdfFileInput.value = '';
                 fileNameDisplay.textContent = '';
                 uploadButton.disabled = true;
-                fetchStats(); // Mettre à jour les stats après un succès
+                fetchStats();
+                fetchHistory();
             } else {
                 const errorData = await response.json();
                 showAlert(singleUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue.'}`, 'error');
@@ -202,15 +784,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showAlert(element, message, type) {
+    async function fetchHistory() {
+        try {
+            const response = await fetch('/history');
+            const data = await response.json();
+            historyList.innerHTML = '';
+            if (data.files && data.files.length > 0) {
+                data.files.forEach(file => {
+                    const item = document.createElement('div');
+                    item.classList.add('history-item');
+                    item.innerHTML = `<span class="history-filename">${file.filename}</span><span class="history-status status-${file.status}">${file.status}</span>`;
+                    historyList.appendChild(item);
+                });
+            } else {
+                historyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucun historique disponible.</p>';
+            }
+        } catch (error) {
+            historyList.innerHTML = '<p style="text-align: center; color: red;">Erreur de chargement de l\'historique.</p>';
+        }
+    }
+
+    function showAlert(element, message, type, hide = false) {
+        if (hide) {
+            element.style.display = 'none';
+            return;
+        }
         element.textContent = message;
         element.className = `alert alert-${type}`;
-        element.style.display = 'block';
+        element.style.display = 'flex';
     }
 
     function showLoading(isLoading) {
         loadingOverlay.style.display = isLoading ? 'flex' : 'none';
     }
+
+    // --- Logique pour le Drag and Drop ---
+    function setupDropArea(area, input, displayFunction) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            area.addEventListener(eventName, () => area.classList.add('drag-over'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, () => area.classList.remove('drag-over'), false);
+        });
+        area.addEventListener('drop', (e) => {
+            input.files = e.dataTransfer.files;
+            displayFunction(input, document.getElementById(displayFunction === updateFileNameDisplay ? 'fileNameDisplay' : 'batchFileNamesDisplay'));
+        }, false);
+    }
+
+    setupDropArea(document.getElementById('dropArea'), pdfFileInput, updateFileNameDisplay);
+    // Note: La logique pour le batch upload n'est pas complètement implémentée ici, mais le drag-drop est prêt.
+
 });
 </script>
 </body>
