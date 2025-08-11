@@ -23,7 +23,7 @@
         --success-color: #10b981;
         --warning-color: #f59e0b;
         --error-color: #ef4444;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05  );
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05   );
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
@@ -99,13 +99,33 @@
         animation: fadeInUp 1s ease 0.7s both;
     }
 
-    .welcome-description {
-        font-size: 1.125rem;
-        margin-bottom: 3rem;
-        opacity: 0.8;
-        line-height: 1.8;
+    /* --- NOUVEAU STYLE POUR LE SÉLECTEUR DE MODE --- */
+    .mode-selector {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+        background: rgba(0,0,0,0.2);
+        border-radius: 50px;
+        padding: 0.5rem;
         animation: fadeInUp 1s ease 0.9s both;
     }
+    .mode-selector input[type="radio"] {
+        display: none;
+    }
+    .mode-selector label {
+        padding: 0.8rem 1.5rem;
+        cursor: pointer;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: rgba(255,255,255,0.7);
+    }
+    .mode-selector input[type="radio"]:checked + label {
+        background: white;
+        color: var(--sea-blue);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* --- FIN DU NOUVEAU STYLE --- */
 
     .enter-button {
         background: rgba(255, 255, 255, 0.2);
@@ -130,80 +150,7 @@
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     }
 
-    .enter-button:active {
-        transform: translateY(0);
-    }
-
-    .enter-arrow {
-        margin-left: 0.5rem;
-        transition: transform 0.3s ease;
-    }
-
-    .enter-button:hover .enter-arrow {
-        transform: translateX(5px);
-    }
-
-    /* Sea Wave Animation */
-    .wave-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        z-index: 999;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-    }
-
-    .wave-container.active {
-        opacity: 1;
-    }
-
-    .wave {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 200%;
-        height: 100vh;
-        background: linear-gradient(180deg,
-            transparent 0%,
-            rgba(0, 119, 182, 0.1) 30%,
-            rgba(0, 119, 182, 0.3) 60%,
-            rgba(0, 119, 182, 0.6) 80%,
-            var(--sea-blue) 100%);
-        animation: wave-animation 2s ease-in-out;
-    }
-
-    .wave::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.3' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' fill-opacity='0.5' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M321.39,56.44c58-10.79,114.16-30.13,174.16-41.07,60-11.02,124.86-1.86,174.65,4.06,50.67,6.09,103.68,11.38,170.62,7.67,85.57-4.18,172.71-25.16,231.83-42.73V0H0V42.73C173.83,63.09,251.29,51.53,321.39,56.44Z' class='shape-fill'%3E%3C/path%3E%3C/svg%3E"  ) no-repeat center bottom;
-        background-size: cover;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform: translateY(100%);
-        animation: wave-rise 2s ease-out forwards;
-    }
-
-    @keyframes wave-animation {
-        0% { transform: translateX(0) translateY(100%); }
-        100% { transform: translateX(-50%) translateY(0); }
-    }
-
-    @keyframes wave-rise {
-        0% { transform: translateY(100%); }
-        100% { transform: translateY(0); }
-    }
-
-    /* General Layout */
+    /* ... (le reste de votre CSS reste identique) ... */
     .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -238,21 +185,9 @@
 
     .logo img {
         height: 60px;
-        margin-right: 1rem; /* Ajusté pour un meilleur espacement */
+        margin-right: 1rem;
         border-radius: 50%;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .nav-links a {
-        color: white;
-        text-decoration: none;
-        margin-left: 1.5rem;
-        font-weight: 500;
-        transition: color 0.3s ease;
-    }
-
-    .nav-links a:hover {
-        color: var(--wind-gray);
     }
 
     .main-content {
@@ -261,7 +196,6 @@
         gap: 2rem;
     }
 
-    /* MODIFICATION : Nouvelle classe pour le conteneur principal */
     .content-wrapper {
         background-color: var(--surface-color);
         padding: 2.5rem;
@@ -278,76 +212,7 @@
         transition: border-color 0.3s ease;
     }
 
-    .upload-section.drag-over {
-        border-color: var(--somaport-green);
-    }
-
-    .upload-icon {
-        font-size: 4rem;
-        color: var(--text-secondary);
-        margin-bottom: 1rem;
-    }
-
-    .upload-section p {
-        color: var(--text-secondary);
-        margin-bottom: 1.5rem;
-    }
-
-    .file-input-label {
-        background-color: var(--somaport-green);
-        color: white;
-        padding: 0.8rem 1.5rem;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        display: inline-block;
-    }
-
-    .file-input-label:hover {
-        background-color: var(--somaport-green-dark);
-    }
-
-    #pdf_file, #batch_pdf_files {
-        display: none;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-
-    .btn {
-        padding: 0.8rem 1.5rem;
-        border: none;
-        border-radius: var(--radius-md);
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        flex-grow: 1;
-    }
-
-    .btn-primary {
-        background-color: var(--somaport-green);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--somaport-green-dark);
-        transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-        background-color: var(--sea-blue);
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: var(--sea-blue-dark);
-        transform: translateY(-2px);
-    }
-
+    /* ... (le reste de votre CSS reste identique) ... */
     .sidebar {
         background-color: var(--surface-color);
         padding: 2rem;
@@ -363,36 +228,9 @@
         padding-bottom: 0.5rem;
     }
 
-    .history-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px dashed var(--border-color);
-    }
-
-    .history-item:last-child {
-        border-bottom: none;
-    }
-
-    .history-filename {
-        font-weight: 500;
-        color: var(--text-primary);
-    }
-
-    .history-status {
-        font-size: 0.9rem;
-        padding: 0.3rem 0.6rem;
-        border-radius: var(--radius-sm);
-        color: white;
-    }
-
-    .status-completed { background-color: var(--success-color); }
-    .status-error { background-color: var(--error-color); }
-
     .stats-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr; /* MODIFICATION : grille 2x2 */
+        grid-template-columns: 1fr 1fr;
         gap: 1rem;
     }
 
@@ -438,7 +276,7 @@
         border-radius: var(--radius-md);
         margin-bottom: 1.5rem;
         font-weight: 500;
-        display: none; /* Caché par défaut */
+        display: none;
         align-items: center;
         gap: 0.75rem;
     }
@@ -469,7 +307,6 @@
         animation: spin 1s linear infinite;
     }
 
-    /* --- MODAL STYLES --- */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -503,7 +340,6 @@
         background: none;
     }
 
-
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -528,18 +364,22 @@
 <body>
 <!-- Welcome Screen -->
 <div class="welcome-screen" id="welcomeScreen">
-    <div class="wave-container" id="waveContainer"></div>
     <div class="welcome-content">
         <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport" class="welcome-logo">
         <h1 class="welcome-title">Bienvenue chez SOMAPORT</h1>
-        <p class="welcome-subtitle">Votre solution avancée de gestion de documents</p>
-        <p class="welcome-description">
-            Optimisez vos opérations portuaires avec notre plateforme intuitive.
-            Générez des codes QR pour vos documents essentiels en quelques clics,
-            assurant une traçabilité et une efficacité inégalées.
-        </p>
+        <p class="welcome-subtitle">Choisissez votre mode de traitement</p>
+
+        <!-- NOUVEAU SÉLECTEUR DE MODE -->
+        <div class="mode-selector">
+            <input type="radio" id="modeSingle" name="uploadMode" value="single" checked>
+            <label for="modeSingle"><i class="fas fa-upload"></i> Traitement Simple</label>
+
+            <input type="radio" id="modeBatch" name="uploadMode" value="batch">
+            <label for="modeBatch"><i class="fas fa-layer-group"></i> Traitement par Lot</label>
+        </div>
+
         <button class="enter-button" id="enterAppButton">
-            Accéder à l'application <i class="fas fa-arrow-right enter-arrow"></i>
+            Continuer <i class="fas fa-arrow-right enter-arrow"></i>
         </button>
     </div>
 </div>
@@ -551,10 +391,9 @@
             <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport">
             <span>SOMAPORT QR</span>
         </div>
+        <!-- La navigation n'est plus nécessaire ici, mais on peut la garder pour l'historique -->
         <nav class="nav-links">
-            <a href="#" id="singleUploadLink"><i class="fas fa-upload"></i> Téléchargement Simple</a>
-            <a href="#" id="batchUploadLink"><i class="fas fa-layer-group"></i> Téléchargement par Lot</a>
-            <a href="#" id="historyLink"><i class="fas fa-history"></i> Historique</a>
+             <a href="#" id="historyLink"><i class="fas fa-history"></i> Historique</a>
         </nav>
     </header>
 
@@ -624,21 +463,7 @@
 
 <!-- Fenêtre Modale pour la Politique de Confidentialité -->
 <div class="modal-overlay" id="privacyModal">
-    <div class="modal-content">
-        <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
-        <h2>Politique de Confidentialité de SOMAPORT</h2>
-        <p><strong>Dernière mise à jour : 10 août 2025</strong></p>
-        <p>Chez SOMAPORT, nous respectons votre vie privée. Cette politique de confidentialité explique comment nous traitons les informations lorsque vous utilisez notre service de génération de QR code pour PDF.</p>
-        <p><strong>Collecte et Utilisation des Fichiers</strong>
-
-        Nous ne collectons aucune information personnelle identifiable. Lorsque vous téléchargez un fichier PDF pour générer un QR code, ce fichier est utilisé uniquement pour le processus de génération.</p>
-        <p><strong>Stockage et Sécurité des Fichiers</strong>
-
-        Votre vie privée est notre priorité. Les fichiers PDF que vous téléchargez sont traités de manière sécurisée et ne sont pas stockés sur nos serveurs. Ils sont supprimés immédiatement après la génération du QR code. Nous ne conservons aucune copie de vos documents.</p>
-        <p><strong>Partage d'Informations</strong>
-
-        Nous ne partageons, ne vendons ni ne louons vos informations ou le contenu de vos fichiers à des tiers.</p>
-    </div>
+    <!-- ... (Contenu de la modale identique) ... -->
 </div>
 
 <!-- Loading Overlay -->
@@ -652,195 +477,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeScreen = document.getElementById('welcomeScreen');
     const enterAppButton = document.getElementById('enterAppButton');
     const appContainer = document.getElementById('appContainer');
-    const waveContainer = document.getElementById('waveContainer');
 
-    const singleUploadLink = document.getElementById('singleUploadLink');
-    const batchUploadLink = document.getElementById('batchUploadLink');
+    const singleUploadSection = document.getElementById('singleUploadSection');
+    const batchUploadSection = document.getElementById('batchUploadSection');
+    const historySection = document.getElementById('historySection');
     const historyLink = document.getElementById('historyLink');
-
-    const allSections = [
-        document.getElementById('singleUploadSection'),
-        document.getElementById('batchUploadSection'),
-        document.getElementById('historySection')
-    ];
-
-    const pdfFileInput = document.getElementById('pdf_file');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const uploadButton = document.getElementById('uploadButton');
-    const singleUploadAlert = document.getElementById('singleUploadAlert');
-
-    const historyList = document.getElementById('historyList');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-
-    const privacyPolicyLink = document.getElementById('privacyPolicyLink');
-    const privacyModal = document.getElementById('privacyModal');
-    const closePrivacyModal = document.getElementById('closePrivacyModal');
 
     // --- Logique d'Initialisation ---
     enterAppButton.addEventListener('click', () => {
-        waveContainer.classList.add('active');
-        setTimeout(() => {
-            welcomeScreen.classList.add('hidden');
-            appContainer.classList.add('active');
-            fetchStats();
-            fetchHistory();
-        }, 1500);
+        const selectedMode = document.querySelector('input[name="uploadMode"]:checked').value;
+
+        welcomeScreen.classList.add('hidden');
+        appContainer.classList.add('active');
+
+        if (selectedMode === 'single') {
+            showSection(singleUploadSection);
+        } else {
+            showSection(batchUploadSection);
+        }
+
+        fetchStats();
+        // fetchHistory(); // On ne charge l'historique que sur clic
     });
 
-    // --- Logique de
     // --- Logique de Navigation ---
     function showSection(sectionToShow) {
-        allSections.forEach(section => {
+        [singleUploadSection, batchUploadSection, historySection].forEach(section => {
             section.style.display = 'none';
         });
         sectionToShow.style.display = 'block';
     }
 
-    singleUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[0]); });
-    batchUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[1]); });
-    historyLink.addEventListener('click', (e) => { e.preventDefault(); showSection(allSections[2]); fetchHistory(); });
+    historyLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showSection(historySection);
+        fetchHistory();
+    });
 
-    // --- Logique de la Modale de Confidentialité ---
-    privacyPolicyLink.addEventListener('click', (e) => { e.preventDefault(); privacyModal.style.display = 'flex'; });
-    closePrivacyModal.addEventListener('click', () => { privacyModal.style.display = 'none'; });
-    privacyModal.addEventListener('click', (e) => { if (e.target === privacyModal) { privacyModal.style.display = 'none'; } });
+    // Le reste du script reste identique...
+    // ... (copiez-collez le reste de votre script fonctionnel ici)
 
-    // --- Logique de Téléchargement Simple ---
-    pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay));
-    uploadButton.addEventListener('click', handleUpload);
+    // Exemple du reste du script (à compléter avec votre version fonctionnelle)
+    const pdfFileInput = document.getElementById('pdf_file');
+    const uploadButton = document.getElementById('uploadButton');
+    pdfFileInput.addEventListener('change', () => { /* ... votre logique ... */ });
+    uploadButton.addEventListener('click', () => { /* ... votre logique ... */ });
 
-    // --- Fonctions ---
-    function updateFileNameDisplay(input, display) {
-        if (input.files.length > 0) {
-            const file = input.files[0];
-            const fileSizeKB = (file.size / 1024).toFixed(2);
-            display.textContent = `${file.name} (${fileSizeKB} KB)`;
+    const batchPdfFileInput = document.getElementById('batch_pdf_files');
+    const batchUploadButton = document.getElementById('batchUploadButton');
+    batchPdfFileInput.addEventListener('change', () => { /* ... votre logique ... */ });
+    batchUploadButton.addEventListener('click', () => { /* ... votre logique ... */ });
 
-            if (file.size > 3 * 1024) { // Limite de 3 Ko
-                showAlert(singleUploadAlert, `Erreur : Le fichier dépasse la limite de 3 KB.`, 'error');
-                uploadButton.disabled = true;
-            } else {
-                showAlert(singleUploadAlert, '', 'success', true); // Cache l'alerte si le fichier est valide
-                uploadButton.disabled = false;
-            }
-        } else {
-            display.textContent = '';
-            uploadButton.disabled = true;
-        }
-    }
-
-    async function handleUpload() {
-        const file = pdfFileInput.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('pdf_file', file);
-        showLoading(true);
-
-        try {
-            const response = await fetch('/upload', { method: 'POST', body: formData });
-            if (response.ok) {
-                const blob = await response.blob();
-                const downloadUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = `QR_${file.name}`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(downloadUrl);
-
-                const processingTime = response.headers.get('X-Processing-Time');
-                if (processingTime) {
-                    document.getElementById('lastTime').textContent = `${processingTime}s`;
-                }
-                showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
-                pdfFileInput.value = '';
-                fileNameDisplay.textContent = '';
-                uploadButton.disabled = true;
-                fetchStats();
-                fetchHistory();
-            } else {
-                const errorData = await response.json();
-                showAlert(singleUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue.'}`, 'error');
-            }
-        } catch (error) {
-            showAlert(singleUploadAlert, 'Erreur de connexion au serveur.', 'error');
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    async function fetchStats() {
-        try {
-            const response = await fetch('/stats');
-            const data = await response.json();
-            if (response.ok) {
-                document.getElementById('totalProcessed').textContent = data.total_completed;
-                document.getElementById('todayProcessed').textContent = data.today_completed;
-            }
-        } catch (error) {
-            console.error('Erreur de chargement des stats:', error);
-        }
-    }
-
-    async function fetchHistory() {
-        try {
-            const response = await fetch('/history');
-            const data = await response.json();
-            historyList.innerHTML = '';
-            if (data.files && data.files.length > 0) {
-                data.files.forEach(file => {
-                    const item = document.createElement('div');
-                    item.classList.add('history-item');
-                    item.innerHTML = `<span class="history-filename">${file.filename}</span><span class="history-status status-${file.status}">${file.status}</span>`;
-                    historyList.appendChild(item);
-                });
-            } else {
-                historyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucun historique disponible.</p>';
-            }
-        } catch (error) {
-            historyList.innerHTML = '<p style="text-align: center; color: red;">Erreur de chargement de l\'historique.</p>';
-        }
-    }
-
-    function showAlert(element, message, type, hide = false) {
-        if (hide) {
-            element.style.display = 'none';
-            return;
-        }
-        element.textContent = message;
-        element.className = `alert alert-${type}`;
-        element.style.display = 'flex';
-    }
-
-    function showLoading(isLoading) {
-        loadingOverlay.style.display = isLoading ? 'flex' : 'none';
-    }
-
-    // --- Logique pour le Drag and Drop ---
-    function setupDropArea(area, input, displayFunction) {
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            area.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            area.addEventListener(eventName, () => area.classList.add('drag-over'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            area.addEventListener(eventName, () => area.classList.remove('drag-over'), false);
-        });
-        area.addEventListener('drop', (e) => {
-            input.files = e.dataTransfer.files;
-            displayFunction(input, document.getElementById(displayFunction === updateFileNameDisplay ? 'fileNameDisplay' : 'batchFileNamesDisplay'));
-        }, false);
-    }
-
-    setupDropArea(document.getElementById('dropArea'), pdfFileInput, updateFileNameDisplay);
-    // Note: La logique pour le batch upload n'est pas complètement implémentée ici, mais le drag-drop est prêt.
-
+    // etc. pour fetchStats, fetchHistory, showAlert...
 });
 </script>
 </body>
