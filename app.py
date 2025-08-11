@@ -33,7 +33,9 @@ CORS(app)  # Enable CORS for all routes
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
 QR_FOLDER = 'qr'
-DATABASE_FILE = 'somaport_qr.db'
+#DATABASE_FILE = 'somaport_qr.db'
+DATABASE_FILE = '/home/pythonweb12/somaport-qr-app/somaport_qr.db'
+
 ALLOWED_EXTENSIONS = {'pdf'}
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 MAX_BATCH_SIZE = 10  # Maximum files in batch processing
