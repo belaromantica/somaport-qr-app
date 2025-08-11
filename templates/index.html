@@ -11,89 +11,48 @@
             --somaport-green: #66CC33; --somaport-green-dark: #4CAF50; --sea-blue: #0077B6;
             --wind-gray: #ECEFF1; --text-primary: #1e293b; --text-secondary: #64748b;
             --background-color: #f8fafc; --surface-color: #ffffff; --border-color: #e2e8f0;
-            --success-color: #10b981; --error-color: #ef4444; --radius-md: 0.5rem; --radius-lg: 0.75rem;
+            --success-color: #10b981; --error-color: #ef4444; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem;
             --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1 ), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green)); min-height: 100vh; }
-        .welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green)); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.8s ease, visibility 0.8s ease; }
-        .welcome-screen.hidden { opacity: 0; visibility: hidden; }
-        .welcome-content { text-align: center; color: white; max-width: 600px; padding: 2rem; }
-        .welcome-logo { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 2rem; animation: float 3s ease-in-out infinite; }
-        .welcome-title { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
-        .welcome-subtitle { font-size: 1.5rem; font-weight: 300; margin-bottom: 2rem; }
-        .welcome-description { font-size: 1.125rem; margin-bottom: 3rem; line-height: 1.8; }
-        .enter-button { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); color: white; padding: 1rem 2rem; font-size: 1.125rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
-        .enter-button:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; display: none; opacity: 0; transition: opacity 0.8s ease; }
-        .container.active { display: block; opacity: 1; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 2rem; }
-        .logo { display: flex; align-items: center; color: white; font-size: 1.8rem; font-weight: 700; }
-        .logo img { height: 60px; margin-right: 1rem; border-radius: 50%; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
-        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
-        .content-area { background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--sea-blue), var(--somaport-green)); min-height: 100vh; color: var(--text-primary); }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 2rem; }
+        .main-content { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; background-color: var(--surface-color); padding: 2.5rem; border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); }
         .upload-section { text-align: center; }
-        .upload-section .upload-box { background-color: var(--wind-gray); padding: 2rem; border-radius: var(--radius-lg); border: 2px dashed #B0BEC5; }
-        .upload-section .upload-box i { font-size: 4rem; color: var(--text-secondary); margin-bottom: 1rem; }
-        .file-input-label { background-color: var(--somaport-green); color: white; padding: 0.8rem 1.5rem; border-radius: var(--radius-md); cursor: pointer; display: inline-block; }
+        .upload-box { background-color: #f7f9fc; padding: 2rem; border-radius: var(--radius-lg); border: 2px dashed #dce4f0; }
+        .upload-box i { font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .file-input-label { background-color: var(--somaport-green); color: white; padding: 0.8rem 1.5rem; border-radius: var(--radius-md); cursor: pointer; display: inline-block; transition: background-color 0.3s; }
         .file-input-label:hover { background-color: var(--somaport-green-dark); }
         #pdf_file, #batch_pdf_files { display: none; }
-        .button-group { display: flex; gap: 1rem; margin-top: 2rem; }
-        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; flex-grow: 1; }
+        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 1.5rem; }
         .btn-primary { background-color: var(--somaport-green); color: white; }
-        .sidebar { background-color: var(--surface-color); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-        .stat-card { text-align: center; padding: 1rem; }
-        .stat-card h4 { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .sidebar { padding-top: 1rem; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+        .stat-card { background-color: #f7f9fc; padding: 1rem; border-radius: var(--radius-md); text-align: center; }
+        .stat-card h4 { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
         .stat-card p { font-size: 1.8rem; font-weight: 700; color: var(--somaport-green); }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color); }
-        .history-status { font-size: 0.9rem; padding: 0.3rem 0.6rem; border-radius: var(--radius-md); color: white; }
-        .status-completed { background-color: var(--success-color); }
-        .status-error { background-color: var(--error-color); }
+        .footer { text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+        .footer a { color: white; text-decoration: none; font-weight: 500; }
+        .footer a:hover { text-decoration: underline; }
         .alert { padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-weight: 500; }
         .alert-error { background-color: #fee2e2; color: #991b1b; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; color: white; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 2rem; border-radius: var(--radius-lg); max-width: 600px; width: 90%; position: relative; }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; border: none; background: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
-        @media (max-width: 992px) { .main-content { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-content">
-            <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport" class="welcome-logo">
-            <h1 class="welcome-title">Bienvenue chez SOMAPORT</h1>
-            <p class="welcome-subtitle">Votre solution avancée de gestion de documents</p>
-            <button class="enter-button" id="enterAppButton">Accéder à l'application</button>
-        </div>
-    </div>
-
-    <!-- Main Application Container -->
     <div class="container" id="appContainer">
-        <header class="header">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='somaport.jpg') }}" alt="Logo Somaport">
-                <span>SOMAPORT QR</span>
-            </div>
-            <nav class="nav-links">
-                <a href="#" id="singleUploadLink"><i class="fas fa-upload"></i> Téléchargement Simple</a>
-                <a href="#" id="batchUploadLink"><i class="fas fa-layer-group"></i> Téléchargement par Lot</a>
-                <a href="#" id="historyLink"><i class="fas fa-history"></i> Historique</a>
-            </nav>
-        </header>
-
         <div class="main-content">
-            <!-- Zone de contenu principal qui changera -->
-            <div class="content-area">
-
-                <!-- Section pour le téléchargement simple (visible par défaut) -->
+            <!-- Zone de contenu principal -->
+            <div>
                 <section id="singleUploadSection">
                     <div class="upload-section">
                         <h2>Générer un QR Code pour un PDF</h2>
-                        <div class="alert alert-info" id="singleUploadAlert" style="display: none;"></div>
+                        <div class="alert" id="singleUploadAlert" style="display: none;"></div>
                         <div class="upload-box" id="dropArea">
                             <i class="fas fa-file-upload"></i>
                             <p>Glissez & déposez votre fichier PDF ici, ou</p>
@@ -101,39 +60,9 @@
                             <input type="file" id="pdf_file" accept=".pdf">
                         </div>
                         <div id="fileNameDisplay" style="margin-top: 1rem; font-weight: 500;"></div>
-                        <div class="button-group">
-                            <button class="btn btn-primary" id="uploadButton"><i class="fas fa-qrcode"></i> Générer le QR Code</button>
-                        </div>
+                        <button class="btn btn-primary" id="uploadButton" disabled><i class="fas fa-qrcode"></i> Générer le QR Code</button>
                     </div>
                 </section>
-
-                <!-- Section pour le téléchargement par lot (cachée par défaut) -->
-                <section id="batchUploadSection" style="display: none;">
-                     <div class="upload-section">
-                        <h2>Générer des QR Codes par Lot</h2>
-                        <div class="alert alert-info" id="batchUploadAlert" style="display: none;"></div>
-                        <div class="upload-box" id="batchDropArea">
-                            <i class="fas fa-files"></i>
-                            <p>Glissez & déposez plusieurs fichiers PDF ici, ou</p>
-                            <label for="batch_pdf_files" class="file-input-label"><i class="fas fa-folder-open"></i> Choisir des fichiers</label>
-                            <input type="file" id="batch_pdf_files" accept=".pdf" multiple>
-                        </div>
-                        <div id="batchFileNamesDisplay" style="margin-top: 1rem; font-weight: 500;"></div>
-                        <div class="button-group">
-                            <button class="btn btn-primary" id="batchUploadButton"><i class="fas fa-cogs"></i> Générer par Lot</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section pour l'historique (cachée par défaut) -->
-                <section id="historySection" style="display: none;">
-                    <h2>Historique des Traitements</h2>
-                    <div class="alert alert-info" id="historyAlert" style="display: none;"></div>
-                    <div id="historyList">
-                        <p style="text-align: center; color: var(--text-secondary);">Chargement...</p>
-                    </div>
-                </section>
-
             </div>
 
             <!-- Barre latérale avec les statistiques -->
@@ -148,12 +77,25 @@
                         <h4>Aujourd'hui</h4>
                         <p id="todayProcessed">0</p>
                     </div>
-                    <div class="stat-card">
-                        <h4>Dernier Temps</h4>
-                        <p id="lastTime">0s</p>
-                    </div>
+                </div>
+                 <div class="stat-card" style="margin-top: 1rem;">
+                    <h4>Dernier Temps</h4>
+                    <p id="lastTime">0s</p>
                 </div>
             </aside>
+        </div>
+        <footer class="footer">
+            <p>&copy; 2025 SOMAPORT. Tous droits réservés. | <a href="#" id="privacyPolicyLink">Politique de Confidentialité</a></p>
+        </footer>
+    </div>
+
+    <!-- Fenêtre Modale pour la Politique de Confidentialité -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closePrivacyModal">&times;</button>
+            <h2>Politique de Confidentialité de SOMAPORT</h2>
+            <p><strong>Dernière mise à jour : 11 août 2025</strong></p>
+            <p>Nous ne collectons aucune information personnelle. Lorsque vous téléchargez un fichier PDF, il est utilisé uniquement pour générer le QR code et est supprimé de nos serveurs immédiatement après. Nous ne stockons ni ne partageons vos fichiers.</p>
         </div>
     </div>
 
@@ -164,64 +106,51 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Éléments du DOM ---
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const enterAppButton = document.getElementById('enterAppButton');
     const appContainer = document.getElementById('appContainer');
-
-    const singleUploadLink = document.getElementById('singleUploadLink');
-    const batchUploadLink = document.getElementById('batchUploadLink');
-    const historyLink = document.getElementById('historyLink');
-
-    const singleUploadSection = document.getElementById('singleUploadSection');
-    const batchUploadSection = document.getElementById('batchUploadSection');
-    const historySection = document.getElementById('historySection');
-
     const pdfFileInput = document.getElementById('pdf_file');
     const fileNameDisplay = document.getElementById('fileNameDisplay');
     const uploadButton = document.getElementById('uploadButton');
     const singleUploadAlert = document.getElementById('singleUploadAlert');
-
-    const batchPdfFileInput = document.getElementById('batch_pdf_files');
-    const batchFileNamesDisplay = document.getElementById('batchFileNamesDisplay');
-    const batchUploadButton = document.getElementById('batchUploadButton');
-
-    const historyList = document.getElementById('historyList');
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const privacyPolicyLink = document.getElementById('privacyPolicyLink');
+    const privacyModal = document.getElementById('privacyModal');
+    const closePrivacyModal = document.getElementById('closePrivacyModal');
 
-    // --- Logique d'Initialisation ---
-    enterAppButton.addEventListener('click', () => {
-        welcomeScreen.classList.add('hidden');
-        appContainer.classList.add('active');
-        fetchStats();
-        fetchHistory();
-    });
+    // --- Initialisation ---
+    fetchStats();
 
-    // --- Logique de Navigation ---
-    const allSections = [singleUploadSection, batchUploadSection, historySection];
-    function showSection(sectionToShow) {
-        allSections.forEach(section => {
-            section.style.display = 'none';
-        });
-        sectionToShow.style.display = 'block';
+    // --- Logique de Téléchargement ---
+    pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay));
+    uploadButton.addEventListener('click', handleUpload);
+
+    // --- Logique de la modale de confidentialité ---
+    privacyPolicyLink.addEventListener('click', (e) => { e.preventDefault(); privacyModal.style.display = 'flex'; });
+    closePrivacyModal.addEventListener('click', () => { privacyModal.style.display = 'none'; });
+    privacyModal.addEventListener('click', (e) => { if (e.target === privacyModal) { privacyModal.style.display = 'none'; } });
+
+    // --- Fonctions ---
+    function updateFileNameDisplay(input, display) {
+        if (input.files.length > 0) {
+            const file = input.files[0];
+            const fileSizeKB = (file.size / 1024).toFixed(2);
+            display.textContent = `${file.name} (${fileSizeKB} KB)`;
+
+            if (file.size > 3 * 1024) {
+                showAlert(singleUploadAlert, `Erreur : Le fichier dépasse la limite de 3 KB.`, 'error');
+                uploadButton.disabled = true;
+            } else {
+                uploadButton.disabled = false;
+                singleUploadAlert.style.display = 'none'; // Cacher l'alerte si le fichier est valide
+            }
+        } else {
+            display.textContent = '';
+            uploadButton.disabled = true;
+        }
     }
 
-    singleUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(singleUploadSection); });
-    batchUploadLink.addEventListener('click', (e) => { e.preventDefault(); showSection(batchUploadSection); });
-    historyLink.addEventListener('click', (e) => { e.preventDefault(); showSection(historySection); fetchHistory(); });
-
-    // --- Logique de Téléchargement Simple ---
-    pdfFileInput.addEventListener('change', () => updateFileNameDisplay(pdfFileInput, fileNameDisplay));
-    uploadButton.addEventListener('click', async () => {
+    async function handleUpload() {
         const file = pdfFileInput.files[0];
-        if (!file) {
-            showAlert(singleUploadAlert, 'Veuillez sélectionner un fichier PDF.', 'error');
-            return;
-        }
-        if (file.size > 3 * 1024) {
-             showAlert(singleUploadAlert, 'Erreur : Le fichier dépasse la limite de 3 KB.', 'error');
-             return;
-        }
+        if (!file) return;
 
         const formData = new FormData();
         formData.append('pdf_file', file);
@@ -234,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const downloadUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = downloadUrl;
-                a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'document.pdf';
+                a.download = `QR_${file.name}`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
@@ -247,8 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showAlert(singleUploadAlert, 'QR Code généré et téléchargé avec succès !', 'success');
                 pdfFileInput.value = '';
                 fileNameDisplay.textContent = '';
-                fetchHistory();
-                fetchStats();
+                uploadButton.disabled = true;
+                fetchStats(); // Mettre à jour les stats après un succès
             } else {
                 const errorData = await response.json();
                 showAlert(singleUploadAlert, `Erreur: ${errorData.error || 'Une erreur est survenue.'}`, 'error');
@@ -257,51 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showAlert(singleUploadAlert, 'Erreur de connexion au serveur.', 'error');
         } finally {
             showLoading(false);
-        }
-    });
-
-    // --- Logique de Téléchargement par Lot ---
-    batchPdfFileInput.addEventListener('change', () => {
-        batchFileNamesDisplay.textContent = `${batchPdfFileInput.files.length} fichiers sélectionnés`;
-    });
-    batchUploadButton.addEventListener('click', async () => {
-        // La logique pour le batch upload reste la même...
-    });
-
-    // --- Fonctions Utilitaires ---
-    function updateFileNameDisplay(input, display) {
-        if (input.files.length > 0) {
-            const file = input.files[0];
-            const fileSizeKB = (file.size / 1024).toFixed(2);
-            display.textContent = `${file.name} (${fileSizeKB} KB)`;
-            uploadButton.disabled = false;
-            if (file.size > 3 * 1024) {
-                showAlert(singleUploadAlert, `Erreur : Le fichier dépasse la limite de 3 KB.`, 'error');
-                uploadButton.disabled = true;
-            }
-        } else {
-            display.textContent = '';
-            uploadButton.disabled = false;
-        }
-    }
-
-    async function fetchHistory() {
-        try {
-            const response = await fetch('/history');
-            const data = await response.json();
-            historyList.innerHTML = '';
-            if (data.files && data.files.length > 0) {
-                data.files.forEach(file => {
-                    const item = document.createElement('div');
-                    item.classList.add('history-item');
-                    item.innerHTML = `<span>${file.filename}</span><span class="history-status status-${file.status}">${file.status}</span>`;
-                    historyList.appendChild(item);
-                });
-            } else {
-                historyList.innerHTML = '<p style="text-align: center;">Aucun historique disponible.</p>';
-            }
-        } catch (error) {
-            historyList.innerHTML = '<p style="text-align: center; color: red;">Erreur de chargement.</p>';
         }
     }
 
@@ -312,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 document.getElementById('totalProcessed').textContent = data.total_completed;
                 document.getElementById('todayProcessed').textContent = data.today_completed;
-                // On ne met plus à jour le temps moyen ici
             }
         } catch (error) {
             console.error('Erreur de chargement des stats:', error);
@@ -323,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         element.textContent = message;
         element.className = `alert alert-${type}`;
         element.style.display = 'block';
-        setTimeout(() => { element.style.display = 'none'; }, 5000);
     }
 
     function showLoading(isLoading) {
