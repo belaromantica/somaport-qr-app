@@ -40,7 +40,7 @@ else:
 
 
 ALLOWED_EXTENSIONS = {'pdf'}
-MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
+MAX_FILE_SIZE = 3 * 1024   # 16MB
 MAX_BATCH_SIZE = 10
 
 
@@ -219,10 +219,20 @@ def upload():
         memory_file.seek(0)
 
         logger.info(f"Processing successful, sending file: {filename}")
-        return send_file(
-            memory_file, as_attachment=True,
-            download_name=f'QR_{filename}', mimetype='application/pdf'
+        # Créer la réponse à partir du fichier en mémoire
+        response = send_file(
+            memory_file,
+            as_attachment=True,
+            download_name=f'QR_{filename}',
+            mimetype='application/pdf'
         )
+
+        # Ajouter le temps de traitement dans un en-tête personnalisé
+        response.headers['X-Processing-Time'] = f"{processing_time:.2f}"
+
+        # Renvoyer la réponse modifiée
+        return response
+
     except Exception as e:
         logger.error(f"An error occurred during processing: {e}", exc_info=True)
         return jsonify({'error': 'Une erreur interne est survenue lors du traitement.'}), 500
