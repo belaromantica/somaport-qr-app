@@ -28,7 +28,16 @@ UPLOAD_FOLDER = '/tmp'
 PROCESSED_FOLDER = '/tmp'
 QR_FOLDER = '/tmp'
 # Utiliser le chemin absolu pour la base de données
-DATABASE_FILE = '/home/pythonweb12/somaport-qr-app/somaport_qr.db'
+# Détecte si le code s'exécute sur PythonAnywhere
+if 'PYTHONANYWHERE_DOMAIN' in os.environ:
+    # On est sur le serveur : utiliser le chemin absolu
+    DATABASE_FILE = '/home/pythonweb12/somaport-qr-app/somaport_qr.db'
+else:
+    # On est en local : utiliser un chemin relatif
+    DATABASE_FILE = 'somaport_qr_local.db'
+
+
+
 
 ALLOWED_EXTENSIONS = {'pdf'}
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
@@ -306,3 +315,5 @@ def stats():
 @app.errorhandler(404)
 def not_found(e):
     return render_template('index.html'), 404  # Redirige vers l'accueil en cas de 404
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
