@@ -14,51 +14,41 @@ import time
 from flask_cors import CORS
 import zipfile
 
-# Configure logging
+# --- Configuration ---
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here-for-somaport'  # Change this in production
-CORS(app)
+app.secret_key = 'your-secret-key-here-for-somaport'
+CORS(app, expose_headers=['X-Processing-Time'])
 
-# --- CONFIGURATION POUR PYTHONANYWHERE ---
-# Utiliser le dossier /tmp pour les fichiers temporaires car il est accessible en écriture
-UPLOAD_FOLDER = '/tmp'
-PROCESSED_FOLDER = '/tmp'
-QR_FOLDER = '/tmp'
-# Utiliser le chemin absolu pour la base de données
-# Détecte si le code s'exécute sur PythonAnywhere
+# --- Configuration des Chemins (Local vs. Serveur) ---
 if 'PYTHONANYWHERE_DOMAIN' in os.environ:
-    # On est sur le serveur : utiliser le chemin absolu
-    DATABASE_FILE = '/home/pythonweb12/somaport-qr-app/somaport_qr.db'
+    # Sur le serveur PythonAnywhere
+    BASE_DIR = os.path.join('/home', os.environ.get('USER', 'pythonweb12'), 'somaport-qr-app')
+    TEMP_DIR = '/tmp'
+    DATABASE_FILE = os.path.join(BASE_DIR, 'somaport_qr.db')
 else:
-    # On est en local : utiliser un chemin relatif
-    DATABASE_FILE = 'somaport_qr_local.db'
-
-
-
+    # En local sur votre machine
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    TEMP_DIR = os.path.join(BASE_DIR, 'temp')
+    DATABASE_FILE = os.path.join(BASE_DIR, 'somaport_qr_local.db')
+    os.makedirs(TEMP_DIR, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {'pdf'}
-MAX_FILE_SIZE = 3 * 1024   # 16MB
-MAX_BATCH_SIZE = 10
+MAX_FILE_SIZE = 3 * 1024  # 3 KB
 
 
-# La création des dossiers n'est plus nécessaire car /tmp existe déjà
-# for folder in [UPLOAD_FOLDER, PROCESSED_FOLDER, QR_FOLDER]:
-#     os.makedirs(folder, exist_ok=True)
-
+# --- Base de Données ---
 def init_database():
-    """Initialize SQLite database for file tracking"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS files (
             id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, original_filename TEXT,
-            processed_filename TEXT, upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            processing_time REAL, status TEXT DEFAULT 'pending', bon_delivrer TEXT,
-            conteneur TEXT, permis_douane TEXT, date_sortie TEXT, file_size INTEGER,
-            error_message TEXT
+            upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, processing_time REAL, 
+            status TEXT, bon_delivrer TEXT, conteneur TEXT, permis_douane TEXT, 
+            date_sortie TEXT, file_size INTEGER, error_message TEXT
         )
     ''')
     conn.commit()
@@ -68,76 +58,63 @@ def init_database():
 init_database()
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def get_session_id():
-    if 'session_id' not in session:
-        session['session_id'] = str(uuid.uuid4())
-    return session['session_id']
-
-
 def log_file_processing(session_id, filename, status, **kwargs):
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
     if status == 'started':
-        cursor.execute('''
-            INSERT INTO files (session_id, original_filename, status, file_size)
-            VALUES (?, ?, ?, ?)
-        ''', (session_id, filename, status, kwargs.get('file_size', 0)))
+        cursor.execute(
+            "INSERT INTO files (session_id, original_filename, status, file_size) VALUES (?, ?, ?, ?)",
+            (session_id, filename, status, kwargs.get('file_size', 0))
+        )
     else:
-        cursor.execute('''
-            UPDATE files SET status = ?, processing_time = ?, processed_filename = ?,
-            bon_delivrer = ?, conteneur = ?, permis_douane = ?, date_sortie = ?, error_message = ?
-            WHERE id = (SELECT max(id) FROM files WHERE session_id = ? AND original_filename = ?)
-        ''', (status, kwargs.get('processing_time'), kwargs.get('processed_filename'),
-              kwargs.get('bon'), kwargs.get('conteneur'), kwargs.get('permis'),
-              kwargs.get('date_sortie'), kwargs.get('error_message'), session_id, filename))
+        cursor.execute(
+            """UPDATE files SET status = ?, processing_time = ?, bon_delivrer = ?, conteneur = ?, 
+               permis_douane = ?, date_sortie = ?, error_message = ?
+               WHERE id = (SELECT max(id) FROM files WHERE session_id = ? AND original_filename = ?)""",
+            (status, kwargs.get('processing_time'), kwargs.get('bon'), kwargs.get('conteneur'),
+             kwargs.get('permis'), kwargs.get('date_sortie'), kwargs.get('error_message'),
+             session_id, filename)
+        )
     conn.commit()
     conn.close()
 
 
+# --- Fonctions de Traitement PDF (INCHANGÉES) ---
 def extract_data_from_pdf(pdf_path):
     try:
         with open(pdf_path, "rb") as f:
             reader = PdfReader(f)
-            text = ""
-            for page in reader.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text += page_text
+            text = "".join(page.extract_text() for page in reader.pages if page.extract_text())
             text = text.replace('\xa0', ' ').replace('\n', ' ').strip()
-            logger.info(f"Extracted text length: {len(text)} characters")
-            bon_patterns = [r'N[°º]?\s*DU\s*BON\s*A\s*DELIVRER\s*[:\-]?\s*([A-Z0-9\-\/]+)',
-                            r'BON\s*A\s*DELIVRER\s*[:\-]?\s*([A-Z0-9\-\/]+)']
-            conteneur_patterns = [r'CONTENEUR\s*[:\-]?\s*([A-Z]{4}[0-9]{7})', r'\b([A-Z]{4}[0-9]{7})\b']
-            permis_patterns = [r'NUM[ÉE]RO\s*DE\s*PERMIS\s*DE\s*DOUANE\s*[:\-]?\s*([0-9\/\-]+)',
-                               r'PERMIS\s*DE\s*DOUANE\s*[:\-]?\s*([0-9\/\-]+)']
-            date_patterns = [r'DATE\s*LIMITE\s*DE\s*SORTIE\s*LE\s*[:\-]?\s*([0-9]{2}[-/][0-9]{2}[-/][0-9]{4})',
-                             r'Date\s*limite\s*de\s*sortie\s*le\s*[:\-]?\s*([0-9]{2}[-/][0-9]{2}[-/][0-9]{4})']
+            patterns = {
+                'bon': [r'N[°º]?\s*DU\s*BON\s*A\s*DELIVRER\s*[:\-]?\s*([A-Z0-9\-\/]+)',
+                        r'BON\s*A\s*DELIVRER\s*[:\-]?\s*([A-Z0-9\-\/]+)'],
+                'conteneur': [r'CONTENEUR\s*[:\-]?\s*([A-Z]{4}[0-9]{7})', r'\b([A-Z]{4}[0-9]{7})\b'],
+                'permis': [r'NUM[ÉE]RO\s*DE\s*PERMIS\s*DE\s*DOUANE\s*[:\-]?\s*([0-9\/\-]+)',
+                           r'PERMIS\s*DE\s*DOUANE\s*[:\-]?\s*([0-9\/\-]+)'],
+                'date_sortie': [r'DATE\s*LIMITE\s*DE\s*SORTIE\s*LE\s*[:\-]?\s*([0-9]{2}[-/][0-9]{2}[-/][0-9]{4})',
+                                r'Date\s*limite\s*de\s*sortie\s*le\s*[:\-]?\s*([0-9]{2}[-/][0-9]{2}[-/][0-9]{4})']
+            }
 
-            def extract_with_patterns(patterns):
-                for pattern in patterns:
+            def extract(field_patterns):
+                for pattern in field_patterns:
                     match = re.search(pattern, text, re.IGNORECASE)
                     if match: return match.group(1).strip()
                 return "N/A"
 
-            return extract_with_patterns(bon_patterns), extract_with_patterns(
-                conteneur_patterns), extract_with_patterns(permis_patterns), extract_with_patterns(date_patterns)
+            return {key: extract(value) for key, value in patterns.items()}
     except Exception as e:
-        logger.error(f"Error extracting data from PDF: {e}")
-        return "N/A", "N/A", "N/A", "N/A"
+        logger.error(f"Error extracting data: {e}")
+        return {key: "N/A" for key in patterns}
 
 
-def generate_qr_code(bon, conteneur, permis, date_sortie, output_path):
-    qr_text = f"Bon à délivrer: {bon}\nConteneur: {conteneur}\nPermis de Douane: {permis}\nDate limite sortie: {date_sortie}"
+def generate_qr_code(data, output_path):
+    qr_text = f"Bon à délivrer: {data['bon']}\nConteneur: {data['conteneur']}\nPermis de Douane: {data['permis']}\nDate limite sortie: {data['date_sortie']}"
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=10, border=4)
     qr.add_data(qr_text)
     qr.make(fit=True)
     qr_image = qr.make_image(fill_color="black", back_color="white")
     qr_image.save(output_path)
-    logger.info(f"QR code generated successfully: {output_path}")
 
 
 def add_qr_to_pdf(pdf_path, qr_path, output_pdf_path):
@@ -161,169 +138,156 @@ def add_qr_to_pdf(pdf_path, qr_path, output_pdf_path):
     writer.add_page(last_page)
     with open(output_pdf_path, 'wb') as f_out:
         writer.write(f_out)
-    logger.info(f"QR code added to PDF successfully: {output_pdf_path}")
 
 
+# --- Routes Flask ---
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-# --- FONCTION UPLOAD CORRIGÉE ET ROBUSTE ---
 @app.route('/upload', methods=['POST'])
 def upload():
     session_id = get_session_id()
-    if 'pdf_file' not in request.files:
-        return jsonify({'error': 'Aucun fichier reçu'}), 400
+    if 'pdf_file' not in request.files: return jsonify({'error': 'Aucun fichier reçu'}), 400
     file = request.files['pdf_file']
-    if file.filename == '':
-        return jsonify({'error': 'Aucun fichier sélectionné'}), 400
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'Type de fichier non autorisé.'}), 400
+    if file.filename == '': return jsonify({'error': 'Aucun fichier sélectionné'}), 400
 
     filename = secure_filename(file.filename)
-    input_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_{filename}")
-    output_path = ""
-    qr_path = ""
+    unique_id = str(uuid.uuid4())
+    input_path = os.path.join(TEMP_DIR, f"{unique_id}_{filename}")
+    output_path = os.path.join(TEMP_DIR, f"qr_{unique_id}_{filename}")
+    qr_path = os.path.join(TEMP_DIR, f"qr_img_{unique_id}.png")
 
     try:
         start_time = time.time()
         file.save(input_path)
         file_size = os.path.getsize(input_path)
         if file_size > MAX_FILE_SIZE:
-            return jsonify({'error': 'Fichier trop volumineux.'}), 400
+            log_file_processing(session_id, filename, 'error', error_message='File size exceeded')
+            return jsonify({'error': f'Le fichier dépasse la limite de {MAX_FILE_SIZE / 1024} KB.'}), 400
 
-        logger.info(f"File uploaded: {filename}")
         log_file_processing(session_id, filename, 'started', file_size=file_size)
 
-        bon, conteneur, permis, date_sortie = extract_data_from_pdf(input_path)
-
-        qr_filename = f'qr_{session_id}_{filename}.png'
-        qr_path = os.path.join(QR_FOLDER, qr_filename)
-        generate_qr_code(bon, conteneur, permis, date_sortie, qr_path)
-
-        output_filename = f'qr_{filename}'
-        output_path = os.path.join(PROCESSED_FOLDER, f"{session_id}_{output_filename}")
+        data = extract_data_from_pdf(input_path)
+        generate_qr_code(data, qr_path)
         add_qr_to_pdf(input_path, qr_path, output_path)
 
         processing_time = time.time() - start_time
-        log_file_processing(
-            session_id, filename, 'completed', processing_time=processing_time,
-            processed_filename=output_filename, bon=bon, conteneur=conteneur,
-            permis=permis, date_sortie=date_sortie
-        )
+        log_file_processing(session_id, filename, 'completed', processing_time=processing_time, **data)
 
-        memory_file = BytesIO()
-        with open(output_path, 'rb') as f:
-            memory_file.write(f.read())
-        memory_file.seek(0)
-
-        logger.info(f"Processing successful, sending file: {filename}")
-        # Créer la réponse à partir du fichier en mémoire
-        response = send_file(
-            memory_file,
-            as_attachment=True,
-            download_name=f'QR_{filename}',
-            mimetype='application/pdf'
-        )
-
-        # Ajouter le temps de traitement dans un en-tête personnalisé
+        response = send_file(output_path, as_attachment=True, download_name=f'QR_{filename}')
         response.headers['X-Processing-Time'] = f"{processing_time:.2f}"
-
-        # Renvoyer la réponse modifiée
         return response
 
     except Exception as e:
-        logger.error(f"An error occurred during processing: {e}", exc_info=True)
-        return jsonify({'error': 'Une erreur interne est survenue lors du traitement.'}), 500
+        logger.error(f"Error in /upload: {e}", exc_info=True)
+        log_file_processing(session_id, filename, 'error', error_message=str(e))
+        return jsonify({'error': 'Une erreur interne est survenue.'}), 500
     finally:
-        # Nettoyage garanti des fichiers temporaires
-        if os.path.exists(input_path): os.remove(input_path)
-        if os.path.exists(output_path): os.remove(output_path)
-        if os.path.exists(qr_path): os.remove(qr_path)
+        for path in [input_path, output_path, qr_path]:
+            if os.path.exists(path): os.remove(path)
 
 
 @app.route('/batch_upload', methods=['POST'])
 def batch_upload():
     session_id = get_session_id()
-    memory_file = BytesIO()
-    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+    memory_zip = BytesIO()
+    with zipfile.ZipFile(memory_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
         files = request.files.getlist('pdf_files')
-        if not files or len(files) == 0: return jsonify({'error': 'Aucun fichier reçu'}), 400
-        if len(files) > MAX_BATCH_SIZE: return jsonify({'error': f'Trop de fichiers. Maximum: {MAX_BATCH_SIZE}'}), 400
+        if not files: return jsonify({'error': 'Aucun fichier reçu'}), 400
 
         for file in files:
-            if file.filename == '' or not allowed_file(file.filename): continue
-            input_path, output_path, qr_path = "", "", ""
+            if file.filename == '' or not file.filename.lower().endswith('.pdf'): continue
+
+            filename = secure_filename(file.filename)
+            unique_id = str(uuid.uuid4())
+            input_path = os.path.join(TEMP_DIR, f"batch_{unique_id}_{filename}")
+            output_path = os.path.join(TEMP_DIR, f"batch_qr_{unique_id}_{filename}")
+            qr_path = os.path.join(TEMP_DIR, f"batch_qr_img_{unique_id}.png")
+
             try:
-                filename = secure_filename(file.filename)
-                input_path = os.path.join(UPLOAD_FOLDER, f"batch_{session_id}_{filename}")
                 file.save(input_path)
                 if os.path.getsize(input_path) > MAX_FILE_SIZE: continue
 
-                bon, conteneur, permis, date_sortie = extract_data_from_pdf(input_path)
-                qr_filename = f'qr_batch_{session_id}_{filename}.png'
-                qr_path = os.path.join(QR_FOLDER, qr_filename)
-                generate_qr_code(bon, conteneur, permis, date_sortie, qr_path)
-
-                output_filename = f'qr_{filename}'
-                output_path = os.path.join(PROCESSED_FOLDER, f"batch_{session_id}_{output_filename}")
+                data = extract_data_from_pdf(input_path)
+                generate_qr_code(data, qr_path)
                 add_qr_to_pdf(input_path, qr_path, output_path)
-
-                zf.write(output_path, output_filename)
+                zf.write(output_path, f'QR_{filename}')
             except Exception as e:
-                logger.error(f"Error processing file in batch: {e}")
+                logger.error(f"Error in batch for file {filename}: {e}")
             finally:
-                if os.path.exists(input_path): os.remove(input_path)
-                if os.path.exists(output_path): os.remove(output_path)
-                if os.path.exists(qr_path): os.remove(qr_path)
-    memory_file.seek(0)
-    return send_file(memory_file, download_name='processed_files.zip', as_attachment=True)
+                for path in [input_path, output_path, qr_path]:
+                    if os.path.exists(path): os.remove(path)
+
+    memory_zip.seek(0)
+    return send_file(memory_zip, download_name='fichiers_QR.zip', as_attachment=True)
 
 
-@app.route('/history')
-def history():
+@app.route('/dashboard')
+def dashboard():
     session_id = get_session_id()
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    filter_date = request.args.get('date', '')
+    filter_status = request.args.get('status', '')
+
     try:
         conn = sqlite3.connect(DATABASE_FILE)
+        base_query = "FROM files WHERE session_id = ?"
+        params = [session_id]
+
+        if filter_date:
+            base_query += " AND date(upload_time) = ?"
+            params.append(filter_date)
+        if filter_status:
+            base_query += " AND status = ?"
+            params.append(filter_status)
+
         cursor = conn.cursor()
-        cursor.execute('''
-            SELECT original_filename, status FROM files 
-            WHERE session_id = ? ORDER BY upload_time DESC LIMIT 50
-        ''', (session_id,))
-        files = [{'filename': row[0], 'status': row[1]} for row in cursor.fetchall()]
+        cursor.execute(f"SELECT COUNT(*) {base_query}", tuple(params))
+        total_items = cursor.fetchone()[0]
+        total_pages = (total_items + per_page - 1) // per_page
+
+        offset = (page - 1) * per_page
+        query = f"""
+            SELECT original_filename, strftime('%Y-%m-%d', upload_time), strftime('%H:%M:%S', upload_time), processing_time, status
+            {base_query} ORDER BY upload_time DESC LIMIT ? OFFSET ?
+        """
+        params.extend([per_page, offset])
+        cursor.execute(query, tuple(params))
+
+        files = [
+            {'filename': row[0], 'date': row[1], 'time': row[2],
+             'processing_time': f"{row[3]:.2f}s" if row[3] is not None else "N/A", 'status': row[4]}
+            for row in cursor.fetchall()
+        ]
         conn.close()
-        return jsonify({'files': files})
+
+        return jsonify({'files': files, 'total_pages': total_pages, 'current_page': page})
     except Exception as e:
-        logger.error(f"Error getting history: {e}")
-        return jsonify({'error': 'Erreur lors de la récupération de l\'historique'}), 500
+        logger.error(f"Error getting dashboard data: {e}", exc_info=True)
+        return jsonify({'error': 'Erreur de récupération des données'}), 500
 
 
 @app.route('/stats')
 def stats():
+    session_id = get_session_id()
     try:
         conn = sqlite3.connect(DATABASE_FILE)
         cursor = conn.cursor()
-        cursor.execute('SELECT COUNT(*) FROM files WHERE status = "completed"')
+        cursor.execute("SELECT COUNT(*) FROM files WHERE session_id = ? AND status = 'completed'", (session_id,))
         total_completed = cursor.fetchone()[0]
-        cursor.execute("SELECT COUNT(*) FROM files WHERE status = 'completed' AND date(upload_time) = date('now')")
+        cursor.execute(
+            "SELECT COUNT(*) FROM files WHERE session_id = ? AND status = 'completed' AND date(upload_time) = date('now')",
+            (session_id,))
         today_completed = cursor.fetchone()[0]
-        cursor.execute('SELECT AVG(processing_time) FROM files WHERE status = "completed"')
-        avg_processing_time = cursor.fetchone()[0] or 0
         conn.close()
-        return jsonify({
-            'total_completed': total_completed,
-            'today_completed': today_completed,
-            'avg_processing_time': round(avg_processing_time, 2)
-        })
+        return jsonify({'total_completed': total_completed, 'today_completed': today_completed})
     except Exception as e:
         logger.error(f"Error getting stats: {e}")
-        return jsonify({'error': 'Erreur lors de la récupération des statistiques'}), 500
+        return jsonify({'error': 'Erreur de récupération des statistiques'}), 500
 
 
-# Les autres routes (health, progress, errorhandlers) peuvent rester les mêmes
-@app.errorhandler(404)
-def not_found(e):
-    return render_template('index.html'), 404  # Redirige vers l'accueil en cas de 404
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
